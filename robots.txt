@@ -1,4 +1,4 @@
 User-agent: *
 Allow: /
 
-Sitemap: https://vana09179-hash.github.io/tyulen-drop/sitemap.xml
+Sitemap: https://vana09179-hash.github.io/sitemap.xml
