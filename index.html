@@ -760,6 +760,15 @@ html.lite .hero-vid{display:none}
 .sellgrid .card{cursor:pointer}
 .sellgrid .card .odds{left:6px;right:auto;color:var(--mint)}
 .sell-empty{color:var(--muted);padding:30px;text-align:center;width:100%}
+
+/* помощь при нуле ракушек */
+.brokec{position:fixed;left:50%;bottom:96px;transform:translateX(-50%);z-index:140;background:linear-gradient(180deg,#1d1d24,#141418);border:1px solid var(--line2);border-radius:16px;padding:16px;width:min(440px,calc(100vw - 32px));box-shadow:0 20px 60px rgba(0,0,0,.6);animation:brk .35s cubic-bezier(.2,1.5,.4,1)}
+@keyframes brk{from{opacity:0;transform:translate(-50%,24px)}}
+.brokec h4{margin:0 0 4px;font-size:16px}.brokec p{margin:0 0 12px;color:var(--muted);font-size:13.5px}
+.brokec .bb{display:flex;gap:8px;flex-wrap:wrap}
+.brokec button{height:40px;padding:0 16px;border-radius:12px;border:1px solid var(--line2);background:var(--surface2);color:var(--text);font:inherit;font-weight:700;font-size:14px;cursor:pointer}
+.brokec button.pri{background:var(--accent);border-color:transparent}
+.brokec button:disabled{opacity:.5;cursor:default}
 </style>
 </head>
 <body>
@@ -2044,7 +2053,7 @@ function FREE_CASE(){return CASES.filter(isFree).sort((a,b)=>a.p-b.p)[0]||CASES[
 function casePriceHTML(cs){return isFree(cs)?'<span class="fr">Бесплатно</span>':fmt(cs.p)+'<img class="shell3d" src="img/i_shell.webp" alt="ракушек">'}
 function freeHist(){let a=[];try{a=JSON.parse(localStorage.getItem('td_free')||'[]')}catch(e){}const t=Date.now()-36e5;return a.filter(x=>x>t)}
 function payCase(){if(rbOn())return true;const cs=CUR;
-  if(isFree(cs)){const h=freeHist();if(h.length>=FREE_PER_HOUR){const w=Math.ceil((h[0]+36e5-Date.now())/6e4);mjoke(['Бесплатные кейсы: лимит '+FREE_PER_HOUR+' в час. Подожди ~'+w+' мин или открой платный','Тюлени устали! Бесплатный кейс снова через ~'+w+' мин']);return false}
+  if(isFree(cs)){const h=freeHist();if(h.length>=FREE_PER_HOUR){const w=Math.ceil((h[0]+36e5-Date.now())/6e4);brokeCard('Бесплатные кейсы устали','Лимит '+FREE_PER_HOUR+' бесплатных кейсов в час. Следующий откроется через ~'+w+' мин.',helpOptions().filter(b=>!/Бесплатн/.test(b.t)));return false}
     h.push(Date.now());try{localStorage.setItem('td_free',JSON.stringify(h))}catch(e){}return true}
   return spend(cs.p,'кейс')}
 function ctCost(arr){const sum=arr.reduce((a,it)=>a+it.v,0);return Math.max(5,Math.round(sum*3*.1))}
@@ -2087,6 +2096,27 @@ document.getElementById('sellBar').addEventListener('click',e=>{const b=e.target
   const list=[...inv.keys()].filter(it=>r==='all'||it.r===r);if(r==='all'&&!confirm('Продать весь улов?'))return;sellMany(list)});
 const _riS=renderInv;renderInv=function(f){_riS(f);if(typeof mode!=='undefined'&&mode==='sell')renderSell()};
 const _shS=show;show=function(m){_shS(m);if(m==='sell')renderSell()};
+
+/* ===== страховки: помощь при нуле, пособие, сторожевой таймер ===== */
+function brokeCard(title,text,btns){const old=document.querySelector('.brokec');if(old)old.remove();
+  const c=document.createElement('div');c.className='brokec';c.innerHTML='<h4>'+title+'</h4><p>'+text+'</p><div class="bb"></div>';
+  btns.concat([{t:'Закрыть'}]).forEach(b=>{const e=document.createElement('button');e.textContent=b.t;if(b.pri)e.className='pri';if(b.off)e.disabled=true;e.onclick=()=>{c.remove();b.f&&b.f()};c.querySelector('.bb').appendChild(e)});
+  document.body.appendChild(c);setTimeout(()=>c.isConnected&&c.remove(),14000)}
+function sellable(){let v=0;inv.forEach((n,it)=>v+=sellVal(it)*n);return v}
+function helpOptions(){const b=[],sv=sellable(),fh=freeHist(),fl=Math.max(0,FREE_PER_HOUR-fh.length);
+  if(sv>0)b.push({t:'Продать улов · +'+fmt(sv),pri:1,f:()=>show('sell')});
+  b.push(fl>0?{t:'Бесплатный кейс (осталось '+fl+')',pri:!sv,f:()=>{openCase(FREE_CASE())}}:{t:'Бесплатные кейсы: лимит, ~'+Math.ceil((fh[0]+36e5-Date.now())/6e4)+' мин',off:1});
+  if(whLeft()===0)b.push({t:'Колесо бонуса',f:()=>show('wheel')});
+  return b}
+noMoney=function(need){const el=document.getElementById('balp');if(el){el.classList.remove('bad');void el.offsetWidth;el.classList.add('bad')}
+  try{A.lose&&A.lose()}catch(e){}
+  brokeCard('Не хватает ракушек','Нужно '+fmt(need)+', а у тебя '+fmt(getBal())+'. Вот что можно сделать:',helpOptions())};
+/* пособие: пока на балансе меньше 100, раз в 5 минут +10 (до 100) */
+function welfare(){if(rbOn())return;let t=0;try{t=+localStorage.getItem('td_wf')||0}catch(e){}const now=Date.now();if(!t){try{localStorage.setItem('td_wf',now)}catch(e){}return}
+  const k=Math.floor((now-t)/3e5);if(k>0){const b=getBal();if(b<100)setBal(Math.min(100,b+k*10));try{localStorage.setItem('td_wf',t+k*3e5)}catch(e){}}}
+welfare();setInterval(welfare,30000);
+/* сторожевой таймер: если что-то зависло, снимаем блокировку */
+let _bs=0;setInterval(()=>{if(busy){if(!_bs)_bs=Date.now();else if(Date.now()-_bs>90000&&!modal.classList.contains('show')){busy=false;_bs=0;try{spinBtn.disabled=false;document.getElementById('upBtn')&&(upBtn.disabled=false);document.getElementById('btBtn')&&(btBtn.disabled=false);document.getElementById('ctBtn')&&ctRender();document.body.classList.remove('focus')}catch(e){}}}else _bs=0},3000);
 renderBal();
 /* онбординг: подарок новичку + плавающая кнопка */
 addEventListener('DOMContentLoaded',function(){
