@@ -694,6 +694,17 @@ html.lite .hero-vid{display:none}
 .joke img{width:34px;height:34px;object-fit:contain}
 @media (max-width:820px){.wh2{grid-template-columns:1fr}.prizes{grid-template-columns:1fr}}
 @media (prefers-reduced-motion:reduce){.wh2-bulb,.onl i{animation:none}}
+
+/* fix1-mobile */
+.fcta:not(.on){transform:translate(-50%,calc(100% + 140px));opacity:0;pointer-events:none}.fcta{transition:transform .35s cubic-bezier(.2,1.4,.4,1),opacity .25s}
+@media (max-width:900px){.fcta{bottom:86px}.peek{display:none}}
+.bt2-arena>*{min-width:0}
+.bt2-who{min-width:0}
+.bt2-who{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.bt2-got{overflow:hidden;max-height:92px}
+@media (max-width:640px){.bt2-arena.many{grid-template-columns:repeat(2,minmax(0,1fr))!important}.bt2-reel{height:80px}.bt2-strip>div{height:80px}.bt2-vs img{width:64px;height:64px}.bt2-vs .x{font-size:40px}
+ .wh2-lbl .in span{display:none}.wh2-lbl .in .ic{--s:40px!important}.streak div{font-size:9px;padding:6px 0}.streak div b{font-size:12px}
+ .bnav button{font-size:10px}.bnav img{width:26px!important;height:26px!important}}
 </style>
 </head>
 <body>
@@ -971,6 +982,8 @@ html.lite .hero-vid{display:none}
 <nav class="bnav" id="bnav">
   <button class="active" data-mode="cases"><img class="ico3d" src="img/c_fish.webp" alt="">Кейсы</button>
   <button data-mode="up"><img class="ico3d" src="img/i_up.webp" alt="">Апгрейд</button>
+  <button data-mode="battle"><img class="ico3d" src="img/i_fire.webp" alt="">Битва</button>
+  <button data-mode="wheel"><img class="ico3d" src="img/i_star.webp" alt="">Бонус</button>
   <button data-mode="inv"><img class="ico3d" src="img/i_net.webp" alt="">Улов</button>
 </nav>
 
@@ -1767,7 +1780,7 @@ function btInit(){
 function me(){return{n:USER?USER.name:'Ты',pic:USER?userPic(USER):'img/mega.webp',me:true}}
 function btPlayers(stub){const b=[...BOTS].sort(()=>Math.random()-.5).slice(0,BT_OPP);return [me(),...b.map(x=>({n:x.n,pic:'img/'+x.i+'.webp'}))]}
 function btDraw(ps){
-  $('#btArena').style.gridTemplateColumns=`repeat(${ps.length},1fr)`;
+  $('#btArena').style.gridTemplateColumns=`repeat(${ps.length},minmax(0,1fr))`;$('#btArena').classList.toggle('many',ps.length>2);
   $('#btArena').innerHTML=ps.map((p,j)=>`<div class="bt2-p" id="btp${j}"><div class="bt2-who"><img src="${p.pic}" alt="" referrerpolicy="no-referrer">${esc(p.n)}<span class="tag" id="btg${j}">${p.me?'ТЫ':'БОТ'}</span></div>
     <div class="bt2-reel"><div class="bt2-strip" id="bts${j}"></div></div>
     <div class="bt2-bar"><i id="btb${j}"></i></div>
@@ -1781,7 +1794,7 @@ async function btReel(j,pool,res){
   const st=$('#bts'+j),N=26,items=[];for(let k=0;k<N;k++)items.push(pool[Math.floor(Math.random()*pool.length)]);items[N-2]=res;
   st.innerHTML=items.map(it=>`<div>${iconHTML(it,70)}</div>`).join('');
   st.style.transition='none';st.style.transform='translateY(0)';st.offsetHeight;
-  const end=-(N-2)*96;st.style.transition=`transform ${2.1+j*.25}s cubic-bezier(.12,.8,.2,1)`;st.style.transform=`translateY(${end}px)`;
+  const sh=st.firstElementChild?st.firstElementChild.offsetHeight||96:96,end=-(N-2)*sh;st.style.transition=`transform ${2.1+j*.25}s cubic-bezier(.12,.8,.2,1)`;st.style.transform=`translateY(${end}px)`;
 }
 $('#btBtn').onclick=async()=>{
   if(busy)return;if(!USER)guestLogin();busy=true;A.init();A.click();$('#btBtn').disabled=true;$('#btRes').className='bt2-res';
