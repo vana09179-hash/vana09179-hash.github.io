@@ -975,7 +975,7 @@ html.lite .hero-vid{display:none}
       <li><b>Бесплатно</b> — без реальных денег, ставок и рекламы.</li>
     </ul>
   </section>
-  <footer>ТЮЛЕНЬ ДРОП — мемная пародия. Никаких денег, только рыбки и тюлени.</footer>
+  <footer>ТЮЛЕНЬ ДРОП — мемная пародия. Никаких денег, только рыбки и тюлени.<br><small style="opacity:.6">Сайт записывает заходы (IP, страна, действия) для статистики · <a href="privacy.html" style="color:inherit">конфиденциальность</a></small></footer>
   </main>
 </div>
 
@@ -1765,7 +1765,7 @@ $('#ctBtn').onclick=async()=>{
   const up=res.v>=sum;
   $('#ctRes').innerHTML=`<div class="glow" style="--c:${RAR[res.r].c}"></div>${iconHTML(res,150)}<div class="nm">${res.n}</div><div class="vv">${RAR[res.r].n} · ${fmt(res.v)}<img class="shell3d" src="img/i_shell.webp" alt="ракушек"> ${up?'· <b style="color:#3ddc97">×'+(res.v/sum).toFixed(1)+'</b>':''}</div>`;
   if(up){snd('win');const r=$('#ctRes').getBoundingClientRect();FX.burst(r.left+r.width/2,r.top+r.height/2,.5)}else snd('coin');
-  window.tdTrack&&tdTrack('contract');
+  window.tdTrack&&tdTrack('contract');window.tdLog&&tdLog('контракт');
   busy=false;ctRender();
 };
 /* --- case battle v2 (bt2) --- */
@@ -1822,7 +1822,7 @@ $('#btBtn').onclick=async()=>{
     const q=$('#btp0').getBoundingClientRect();FX.burst(q.left+q.width/2,q.top+q.height/3,.7);mjoke(['Мега-Тюлень гордится тобой!','Это было мощно. Тюлени аплодируют ластами','Боты в шоке, кильки в восторге'])}
   else{R.classList.add('lose');R.innerHTML=`<h3>${esc(ps[w].n)} победил</h3><p>Не повезло — у тебя ${fmt(tot[0])}, у него ${fmt(tot[w])}. Реванш?</p><button class="btn-main" id="btAgain">Реванш!</button>`;snd('lose');mjoke(['Бот явно подкручивал… шутка, рандом честный','Ничего, Мега-Тюлень тоже не сразу стал мега','Карась плачет вместе с тобой'])}
   R.classList.add('on');$('#btMsg').textContent='';$('#btAgain').onclick=()=>$('#btBtn').click();
-  window.tdTrack&&tdTrack('battle');busy=false;$('#btBtn').disabled=false;
+  window.tdTrack&&tdTrack('battle');window.tdLog&&tdLog('битва');busy=false;$('#btBtn').disabled=false;
 };
 /* --- daily wheel v2 --- */
 const WH=(()=>{const by=r=>ALL.filter(x=>x.r===r);const pk=(r,i)=>{const a=by(r);return a.length?a[Math.min(i,a.length-1)]:ALL[0]};
@@ -1870,7 +1870,7 @@ $('#whBtn').onclick=()=>{
     $('#whWin').innerHTML=iconHTML(it,56)+`<div><b>${it.n}</b><small>${RAR[it.r].n} · ${fmt(it.v)} ракушек — уже в улове!</small></div>`;$('#whWin').classList.add('on');
     snd(it.r==='gold'||it.r==='cov'?'win':'coin');const q=d.getBoundingClientRect();FX.burst(q.left+q.width/2,q.top+q.height/2,.55);
     if(it===I.mega)mjoke(['ТЫ ВЫБИЛ МЕНЯ?! Ну всё, теперь я твой','Мега-Тюлень лично пожимает тебе ласт']);
-    window.tdTrack&&tdTrack('wheel');busy=false;whSide();whTick()},6100);
+    window.tdTrack&&tdTrack('wheel');window.tdLog&&tdLog('колесо');busy=false;whSide();whTick()},6100);
 };
 /* --- real online + players (abacus) --- */
 (function(){const NS='https://abacus.jasoncameron.dev/',ns='td-k7q2x9/',B=()=>Math.floor(Date.now()/12e4);
@@ -1900,7 +1900,7 @@ let kb='';addEventListener('keydown',e=>{if(e.target.closest&&e.target.closest('
   if(kb.endsWith('тюлень')||kb.endsWith('mega')){kb='';rain(['mega','tsar','nerpa','spyashiy','s_pink','s_cosmo','diamond'],36);mjoke(['Секретный код! Тюлений ливень активирован','Ты нашёл пасхалку. Мега-Тюлень одобряет'])}});
 // шутки на дропы
 const DJ={common:['Водоросль… зато полезно','Ну, килька — тоже рыба','Мега-Тюлень сочувственно молчит','Это разминка, дальше будет лучше'],ind:['Неплохо! Карась доволен','Уже теплее!'],sec:['О-о-о, засекреченный!','Тюлени зашептались…'],cov:['ТАЙНОЕ?! Ты везунчик','Мега-Тюлень уронил рыбку от удивления'],gold:['ЗОЛОТО! Это легендарно','Тюлени всего океана в шоке']};
-const _cel3=celebrate;celebrate=function(item,el,kind,big){_cel3(item,el,kind,big);if(Math.random()<.45||item.r==='gold'||item.r==='cov'){const a=DJ[item.r]||DJ.common;setTimeout(()=>mjoke(a),900)}};
+const _cel3=celebrate;celebrate=function(item,el,kind,big){_cel3(item,el,kind,big);try{window.tdLog&&tdLog(kind==='up'?'апгрейд':'кейс',(kind!=='up'&&CUR?'«'+CUR.n+'» → ':'')+item.n)}catch(e){}if(Math.random()<.45||item.r==='gold'||item.r==='cov'){const a=DJ[item.r]||DJ.common;setTimeout(()=>mjoke(a),900)}};
 // тюлень выглядывает, если долго ничего не делаешь
 const pk=document.createElement('div');pk.className='peek';pk.innerHTML='<img src="img/mega.webp" alt="">';document.body.appendChild(pk);
 let idle;function rs(){clearTimeout(idle);pk.classList.remove('on');idle=setTimeout(()=>{if(mode==='cases'&&!busy){pk.classList.add('on');say('Эй! Ты тут? Крутани кейс, я жду',pk)}},40000)}
@@ -1935,7 +1935,7 @@ addEventListener('DOMContentLoaded',function(){
     $('#giftRar').textContent=RAR[got.r].n;$('#giftRar').style.background=RAR[got.r].c;
     $('#giftBtn').textContent='Круто, забрать!';
     const r=$('#giftIco').getBoundingClientRect();FX.burst(r.left+r.width/2,r.top+r.height/2,.5);
-    window.tdTrack&&tdTrack('gift');
+    window.tdTrack&&tdTrack('gift');window.tdLog&&tdLog('подарок');
   };
 });
 })();
@@ -1956,6 +1956,23 @@ var d=new Date(),day=d.getFullYear()+('0'+(d.getMonth()+1)).slice(-2)+('0'+d.get
 hit('visits');
 if(!ls('td_seen')){ls('td_seen','1');hit('uniq')}
 if(ls('td_day')!==day){ls('td_day',day);hit('d-'+day)}
+})();
+</script>
+<script>
+/* приватный лог заходов → Google Таблица владельца (см. privacy.html) */
+(function(){var URL='https://script.google.com/macros/s/AKfycbweTv_hVb2s-Cm0fQGVUEZh5EXfmN91FHMgijZFiPemo1yXmWnF7ncAAyS9o7sT8idE/exec';
+function ls(k){try{return localStorage.getItem(k)}catch(e){return null}}
+var off=!URL||URL.indexOf('http')!==0||ls('td_notrack')==='1'||/^(localhost|127\.)/.test(location.hostname);
+var geo=null,q=[];
+function player(){try{var u=JSON.parse(ls('td_user'));return u&&u.name?u.name:'гость'}catch(e){return 'гость'}}
+function send(ev,detail){if(off)return;var d={ev:ev,detail:detail||'',player:player(),ua:(navigator.userAgent||'').replace(/\s+/g,' ').slice(0,150)};
+  if(!geo){q.push(d);return}d.ip=geo.ip;d.country=geo.country;d.city=geo.city;
+  try{fetch(URL,{method:'POST',mode:'no-cors',keepalive:true,headers:{'Content-Type':'text/plain'},body:JSON.stringify(d)})}catch(e){}}
+window.tdLog=send;
+if(!off){var c=null;try{c=JSON.parse(sessionStorage.getItem('td_geo'))}catch(e){}
+  var go=function(g){geo=g||{ip:'?',country:'',city:''};try{sessionStorage.setItem('td_geo',JSON.stringify(geo))}catch(e){}var w=q;q=[];w.forEach(function(d){send(d.ev,d.detail)})};
+  if(c)go(c);else fetch('https://ipwho.is/?fields=ip,country,city').then(function(r){return r.json()}).then(function(j){go({ip:j.ip,country:j.country,city:j.city})}).catch(function(){go(null)});
+  send('заход',(document.referrer?'из '+document.referrer.replace(/^https?:\/\//,'').slice(0,60):'напрямую'));}
 })();
 </script>
 </body>

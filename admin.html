@@ -84,6 +84,11 @@ th{color:var(--muted);font-weight:600}
 td:last-child,th:last-child{text-align:right}
 .row{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
 .note{color:var(--muted);font-size:12.5px}
+.log td,.log th{white-space:nowrap;font-size:12.5px}
+.log td:last-child,.log th:last-child{text-align:left;white-space:normal;min-width:160px}
+.log .ev{display:inline-block;padding:2px 8px;border-radius:99px;background:var(--panel2);font-weight:700;font-size:11.5px}
+.log .ip{font-family:ui-monospace,Consolas,monospace;color:var(--sun);cursor:pointer}
+.chip{background:var(--panel2);border:1px solid var(--line);border-radius:99px;padding:5px 10px;font-size:12px;cursor:pointer}
 .ok{color:var(--mint)}.err{color:var(--bar)}
 @media (max-width:860px){.hero,.grid2{grid-template-columns:1fr}.big .v{font-size:52px}.big img{width:150px}}
 @media (max-width:520px){.mini{grid-template-columns:1fr 1fr}.tile .v{font-size:26px}.axis span:nth-child(odd){visibility:hidden}}
@@ -148,6 +153,13 @@ td:last-child,th:last-child{text-align:right}
     <div class="funnel" id="funnel"></div>
   </div>
 
+  <div class="card" style="margin-bottom:14px">
+    <div class="row" style="justify-content:space-between"><div><h2>Кто заходил</h2><div class="s" id="logS">Последние 300 записей: IP, страна, ник и что открыли</div></div>
+      <div class="row"><input id="logQ" placeholder="Поиск: IP, ник, город…" style="background:var(--panel2);border:1px solid var(--line);border-radius:10px;padding:9px 12px;color:var(--text);font:inherit;font-size:13px;min-width:200px"><a class="btn" id="logSheet" target="_blank" rel="noopener">Открыть таблицу</a></div></div>
+    <div style="overflow-x:auto;margin-top:8px"><table class="log"><thead><tr><th>Время</th><th>IP</th><th>Откуда</th><th>Игрок</th><th>Действие</th><th>Детали</th></tr></thead><tbody id="logB"><tr><td colspan="6" class="note">загружаю…</td></tr></tbody></table></div>
+    <div class="row" style="margin-top:12px" id="logIps"></div>
+  </div>
+
   <div class="grid2">
     <div class="card">
       <h2>Мои заходы</h2>
@@ -169,10 +181,10 @@ var API='https://abacus.jasoncameron.dev/get/td-k7q2x9/';
 var $=function(id){return document.getElementById(id)};
 function ss(k,v){try{if(v===undefined)return sessionStorage.getItem(k);if(v===null)sessionStorage.removeItem(k);else sessionStorage.setItem(k,v)}catch(e){}}
 async function sha(t){var b=await crypto.subtle.digest('SHA-256',new TextEncoder().encode(t));return [...new Uint8Array(b)].map(function(x){return x.toString(16).padStart(2,'0')}).join('')}
-function unlock(){$('lock').classList.add('hidden');$('app').classList.remove('hidden');meUI();load()}
+function unlock(){$('lock').classList.add('hidden');$('app').classList.remove('hidden');meUI();load();loadLog()}
 $('lf').onsubmit=async function(e){e.preventDefault();var h=await sha('td-salt:'+$('pw').value);
-  if(h===H){ss('td_adm',H);unlock()}else{$('perr').textContent='Неверный пароль';var l=$('lock');l.classList.remove('shake');void l.offsetWidth;l.classList.add('shake');$('pw').select()}};
-$('out').onclick=function(){ss('td_adm',null);location.reload()};
+  if(h===H){ss('td_adm',H);ss('td_admk',$('pw').value);unlock()}else{$('perr').textContent='Неверный пароль';var l=$('lock');l.classList.remove('shake');void l.offsetWidth;l.classList.add('shake');$('pw').select()}};
+$('out').onclick=function(){ss('td_adm',null);ss('td_admk',null);location.reload()};
 
 function get(k){return fetch(API+k).then(function(r){return r.status===404?{value:0}:r.json()}).then(function(j){return j.value||0}).catch(function(){return null})}
 function fmt(n){return n==null?'?':n.toLocaleString('ru-RU')}
@@ -219,7 +231,20 @@ function meUI(){var off=false;try{off=localStorage.getItem('td_notrack')==='1'}c
   $('me').textContent=off?'Снова считать меня':'Не считать мои заходы';
   $('meSt').innerHTML=off?'<span class="ok">Это устройство не считается ✓</span>':'Это устройство сейчас считается';}
 $('me').onclick=function(){try{var off=localStorage.getItem('td_notrack')==='1';if(off)localStorage.removeItem('td_notrack');else localStorage.setItem('td_notrack','1')}catch(e){}meUI()};
-$('ref').onclick=load;
+$('ref').onclick=function(){load();loadLog()};
+var LOG='https://script.google.com/macros/s/AKfycbweTv_hVb2s-Cm0fQGVUEZh5EXfmN91FHMgijZFiPemo1yXmWnF7ncAAyS9o7sT8idE/exec',ROWS=[];
+function esc(t){return String(t==null?'':t).replace(/[&<>"]/g,function(c){return{'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]})}
+function loadLog(){var k=ss('td_admk');if(!k){$('logB').innerHTML='<tr><td colspan="6" class="note">Выйди и войди заново, чтобы загрузить журнал</td></tr>';return}
+  fetch(LOG+'?k='+encodeURIComponent(k)).then(function(r){return r.json()}).then(function(j){if(j.error){$('logB').innerHTML='<tr><td colspan="6" class="err">Нет доступа к журналу</td></tr>';return}
+    ROWS=j.rows||[];$('logSheet').href=j.url;$('logS').textContent='Всего записей: '+fmt(j.total)+' · показаны последние '+ROWS.length;drawLog()}).catch(function(){$('logB').innerHTML='<tr><td colspan="6" class="err">Журнал не загрузился — нажми «Обновить»</td></tr>'})}
+function drawLog(){var q=($('logQ').value||'').toLowerCase();
+  var rs=ROWS.filter(function(r){return !q||r.join(' ').toLowerCase().indexOf(q)>=0});
+  $('logB').innerHTML=rs.length?rs.map(function(r){var d=new Date(r[0]);return '<tr><td>'+d.toLocaleString('ru-RU',{day:'2-digit',month:'2-digit',hour:'2-digit',minute:'2-digit'})+'</td><td class="ip" data-ip="'+esc(r[1])+'">'+esc(r[1])+'</td><td>'+esc([r[2],r[3]].filter(Boolean).join(', '))+'</td><td>'+esc(r[4])+'</td><td><span class="ev">'+esc(r[5])+'</span></td><td>'+esc(r[6])+'</td></tr>'}).join(''):'<tr><td colspan="6" class="note">Пока пусто — записи появятся, когда кто-то зайдёт</td></tr>';
+  var cnt={};ROWS.forEach(function(r){if(r[5]==='заход')cnt[r[1]]=(cnt[r[1]]||0)+1});
+  var top=Object.keys(cnt).sort(function(a,b){return cnt[b]-cnt[a]}).slice(0,12);
+  $('logIps').innerHTML=top.length?'<span class="note">Частые IP:</span>'+top.map(function(ip){return '<span class="chip" data-ip="'+esc(ip)+'">'+esc(ip)+' ×'+cnt[ip]+'</span>'}).join(''):'';}
+$('logQ').oninput=drawLog;
+document.addEventListener('click',function(e){var t=e.target.closest('[data-ip]');if(!t)return;$('logQ').value=t.dataset.ip;drawLog()});
 if(ss('td_adm')===H)unlock();
 setInterval(function(){if(!$('app').classList.contains('hidden'))load()},12e4);
 })();
