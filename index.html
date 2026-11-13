@@ -2015,7 +2015,9 @@ async function tdSync(){
     const q=new URLSearchParams({act:'sync',id:USER.id,name:USER.name||'',prov:USER.provider||'',inv:accInv().slice(0,2900),val:accVal(),ip:g.ip||'',country:[g.country,g.city].filter(Boolean).join(', ')});
     const j=await fetch(ACC_URL+'?'+q).then(r=>r.json());
     if(j.reset){inv.clear();saveInv();renderInv();mjoke&&mjoke(['Администратор обнулил твой улов'])}
-    if(j.gifts&&j.gifts.length){const got=j.gifts.map(k=>I[k]).filter(Boolean);got.forEach(it=>addInv(it));
+    if(j.gifts&&j.gifts.length){const coins=j.gifts.filter(k=>/^coin:\d+$/.test(k)).reduce((a2,k)=>a2+(+k.slice(5)),0);
+      if(coins&&typeof setBal==='function'){setBal(getBal()+coins,true);try{A.coin&&A.coin()}catch(e){}toastAch('i_shell','Подарок от администрации','+'+fmt(coins)+' ракушек','Уже на твоём балансе!')}
+      const got=j.gifts.map(k=>I[k]).filter(Boolean);got.forEach(it=>addInv(it));
       if(got.length){A.coin&&A.coin();toastAch('mega','Подарок от администрации',got.length===1?got[0].n:got.length+' предметов','Уже в твоём улове!')}}
     if(j.ban){showBan(j.reason);return}
   }catch(e){}finally{accBusy=false}
