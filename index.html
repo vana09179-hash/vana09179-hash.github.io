@@ -712,6 +712,28 @@ html.lite .hero-vid{display:none}
 .card.gold::after{content:"";position:absolute;inset:-2px;border-radius:inherit;padding:2px;background:linear-gradient(90deg,#ff4d4d,#ffb84d,#fff04d,#4dff88,#4dd2ff,#7a5cff,#ff4dd8,#ff4d4d);background-size:200% 100%;animation:rbw 3s linear infinite;-webkit-mask:linear-gradient(#000 0 0) content-box,linear-gradient(#000 0 0);-webkit-mask-composite:xor;mask-composite:exclude;pointer-events:none}
 .card.gold .rr{background:linear-gradient(90deg,#ff6b6b,#ffd36b,#7dff9a,#6bd8ff,#b98bff,#ff6bd8);background-size:200% 100%;-webkit-background-clip:text;background-clip:text;color:transparent!important;animation:rbw 3s linear infinite;font-weight:800}
 .rbw-bg{background:linear-gradient(90deg,#ff4d4d,#ffb84d,#fff04d,#4dff88,#4dd2ff,#7a5cff,#ff4dd8)!important;background-size:200% 100%!important;animation:rbw 3s linear infinite;color:#111!important}
+
+/* cards-v2: красивые карточки + «фью»-полоска */
+.card{border-radius:16px;border:1px solid color-mix(in srgb,var(--c) 22%,#26262d);
+  background:radial-gradient(120% 70% at 50% -5%,color-mix(in srgb,var(--c) 38%,transparent) 0%,transparent 60%),linear-gradient(180deg,#1b1a21,#121216);
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.06),0 6px 18px rgba(0,0,0,.35);transition:transform .2s cubic-bezier(.2,1.4,.4,1),box-shadow .25s,border-color .25s;justify-content:flex-end;gap:4px;padding:0 8px 12px}
+.card::after{height:3px;left:16%;right:16%;bottom:0;border-radius:3px 3px 0 0;box-shadow:0 0 12px var(--c),0 0 3px var(--c)}
+.card .ic{top:7%;transition:transform .3s cubic-bezier(.2,1.4,.4,1);filter:drop-shadow(0 10px 14px rgba(0,0,0,.5)) drop-shadow(0 0 18px color-mix(in srgb,var(--c) 35%,transparent))}
+.card .rr,.card .nm{z-index:2}
+.card .rr{margin-top:auto;font-size:8.5px;font-weight:800;letter-spacing:.08em;padding:2px 8px;border-radius:99px;background:color-mix(in srgb,var(--c) 16%,rgba(0,0,0,.55));border:1px solid color-mix(in srgb,var(--c) 40%,transparent);white-space:nowrap;max-width:100%;overflow:hidden;text-overflow:ellipsis;backdrop-filter:blur(4px)}
+.card .nm{min-height:0;font-weight:700;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;text-shadow:0 2px 6px rgba(0,0,0,.8)}
+.card>.rr::before{content:none}
+.card:not(.mini):not(.win)::before{content:"";position:absolute;left:0;right:0;bottom:0;height:52%;background:linear-gradient(180deg,transparent,rgba(8,8,12,.82));z-index:1;pointer-events:none}
+.card:hover{transform:translateY(-4px);border-color:color-mix(in srgb,var(--c) 55%,#26262d);box-shadow:inset 0 1px 0 rgba(255,255,255,.08),0 12px 28px rgba(0,0,0,.45),0 0 24px color-mix(in srgb,var(--c) 25%,transparent)}
+.card:hover .ic{transform:translateX(-50%) scale(1.07) rotate(-2deg)}
+.card .swp{position:absolute;left:-10%;right:-10%;top:-30%;height:26%;z-index:3;pointer-events:none;opacity:0;
+  background:linear-gradient(180deg,transparent,color-mix(in srgb,var(--c) 30%,rgba(255,255,255,.18)) 45%,rgba(255,255,255,.75) 50%,color-mix(in srgb,var(--c) 30%,rgba(255,255,255,.18)) 55%,transparent);filter:blur(.5px)}
+.card.swipe .swp{animation:swp .55s cubic-bezier(.3,.6,.3,1) forwards}
+@keyframes swp{0%{top:-30%;opacity:0}12%{opacity:1}100%{top:110%;opacity:0}}
+.card.swipe{animation:cardpop .35s cubic-bezier(.2,1.6,.4,1)}
+@keyframes cardpop{40%{transform:scale(.95)}}
+.card.gold .rr{background-color:rgba(0,0,0,.55)}
+@media (prefers-reduced-motion:reduce){.card.swipe .swp,.card.swipe{animation:none}}
 </style>
 </head>
 <body>
@@ -1168,7 +1190,7 @@ function iconHTML(it,s){
   return `<div class="ic img" style="--s:${s}px;--c:${RAR[it.r].c}"><img src="img/${it.img}.webp" alt="" loading="lazy" decoding="async"></div>`;
 }
 function cardHTML(it,cls='',size=84,extra=''){
-  return `<div class="card ${it.r==='gold'?'gold':''} ${cls}" style="--c:${RAR[it.r].c}">${extra}${iconHTML(it,size)}<div class="rr">${RAR[it.r].n}</div><div class="nm">${it.sn||it.n}</div></div>`;
+  return `<div class="card ${it.r==='gold'?'gold':''} ${cls}" style="--c:${RAR[it.r].c}">${extra}<i class="swp"></i>${iconHTML(it,size)}<div class="rr">${RAR[it.r].n}</div><div class="nm">${it.sn||it.n}</div></div>`;
 }
 
 /* ================= AUDIO ================= */
@@ -1992,6 +2014,12 @@ if(!off){var c=null;try{c=JSON.parse(sessionStorage.getItem('td_geo'))}catch(e){
   if(c)go(c);else fetch('https://ipwho.is/?fields=ip,country,city').then(function(r){return r.json()}).then(function(j){go({ip:j.ip,country:j.country,city:j.city})}).catch(function(){go(null)});
   send('заход',(document.referrer?'из '+document.referrer.replace(/^https?:\/\//,'').slice(0,60):'напрямую'));}
 })();
+</script>
+<script>
+/* «фью»: полоска пробегает по карточке сверху вниз при нажатии и при первом наведении */
+(function(){function go(c){if(!c)return;c.classList.remove('swipe');void c.offsetWidth;c.classList.add('swipe');clearTimeout(c._sw);c._sw=setTimeout(function(){c.classList.remove('swipe')},600)}
+document.addEventListener('pointerdown',function(e){var c=e.target.closest&&e.target.closest('.card');if(c&&!c.closest('#track'))go(c)},true);
+document.addEventListener('pointerover',function(e){var c=e.target.closest&&e.target.closest('.card');if(c&&!c._hv&&!c.closest('#track')){c._hv=1;go(c)}});})();
 </script>
 </body>
 </html>
