@@ -6,107 +6,200 @@
 <meta name="robots" content="noindex,nofollow">
 <title>Админка · ТЮЛЕНЬ ДРОП</title>
 <link rel="icon" href="favicon.ico">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@500;600;700;800;900&display=swap" rel="stylesheet">
 <style>
-:root{--bg:#0b0b0d;--panel:#141418;--line:#26262d;--text:#f3f3f5;--muted:#8c8c98;--dim:#5d5d68;--accent:#ef3b2d;--sun:#ffc93c;--bar:#ff6f59;--bar-h:#ffc93c}
+:root{--bg:#0b0b0d;--panel:#131317;--panel2:#1a1a20;--line:#25252d;--text:#f3f3f5;--muted:#8c8c98;--dim:#5d5d68;--accent:#ef3b2d;--sun:#ffc93c;--mint:#3ddc97;--bar:#ff6f59}
 *{box-sizing:border-box}
-body{margin:0;background:var(--bg);color:var(--text);font:15px/1.45 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
-.wrap{max-width:980px;margin:0 auto;padding:24px 16px 60px}
-header{display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:22px}
-header img{width:44px;height:44px}
-h1{font-size:22px;margin:0;font-weight:800;letter-spacing:.3px}
-h1 b{color:var(--sun)}
+body{margin:0;background:var(--bg);color:var(--text);font:15px/1.45 Montserrat,system-ui,sans-serif;min-height:100vh}
+body::before{content:"";position:fixed;inset:-20% -10% auto;height:70vh;background:radial-gradient(ellipse at 70% 0,rgba(239,59,45,.22),transparent 60%),radial-gradient(ellipse at 10% 10%,rgba(255,201,60,.10),transparent 50%);pointer-events:none;z-index:0}
+.wrap{position:relative;z-index:1;max-width:1100px;margin:0 auto;padding:22px 16px 60px}
+/* lock */
+.lock{position:fixed;inset:0;z-index:10;display:flex;align-items:center;justify-content:center;padding:16px;background:var(--bg)}
+.lock::before{content:"";position:absolute;inset:0;background:radial-gradient(circle at 50% 30%,rgba(239,59,45,.25),transparent 55%)}
+.lock form{position:relative;width:min(360px,100%);background:var(--panel);border:1px solid var(--line);border-radius:24px;padding:26px;text-align:center;box-shadow:0 30px 80px rgba(0,0,0,.6)}
+.lock img{width:130px;margin:-80px auto 6px;display:block;filter:drop-shadow(0 12px 24px rgba(0,0,0,.6));animation:bob 3s ease-in-out infinite}
+@keyframes bob{50%{transform:translateY(-8px)}}
+.lock h1{margin:0 0 4px;font-size:22px;font-weight:900}
+.lock p{margin:0 0 16px;color:var(--muted);font-size:13px}
+.lock input{width:100%;background:var(--panel2);border:1px solid var(--line);border-radius:12px;padding:13px 14px;color:var(--text);font:inherit;font-size:16px;outline:none}
+.lock input:focus{border-color:var(--sun)}
+.lock button{margin-top:10px;width:100%;border:0;border-radius:12px;padding:13px;background:var(--accent);color:#fff;font:inherit;font-weight:800;font-size:15px;cursor:pointer}
+.lock .err{color:var(--bar);font-size:13px;min-height:20px;margin-top:8px}
+.lock.shake form{animation:shake .4s}
+@keyframes shake{25%{transform:translateX(-10px)}75%{transform:translateX(10px)}}
+.hidden{display:none!important}
+/* header */
+header{display:flex;align-items:center;gap:14px;flex-wrap:wrap;margin-bottom:22px}
+header .logo{width:52px;height:52px}
+h1.t{font-size:24px;margin:0;font-weight:900;letter-spacing:.2px}
+h1.t b{color:var(--sun)}
+.sub{color:var(--muted);font-size:13px}
 .sp{flex:1}
-button,.lnk{background:#202026;color:var(--text);border:1px solid var(--line);border-radius:10px;padding:8px 14px;font:inherit;font-weight:600;cursor:pointer;text-decoration:none}
-button:hover,.lnk:hover{border-color:#3a3a44}
-.tiles{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:12px;margin-bottom:16px}
-.tile{background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:16px}
-.tile .k{color:var(--muted);font-size:13px;font-weight:600}
-.tile .v{font-size:34px;font-weight:800;margin-top:4px;font-variant-numeric:tabular-nums}
-.tile .h{color:var(--dim);font-size:12px;margin-top:2px}
-.card{background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:18px;margin-bottom:16px}
-.card h2{font-size:16px;margin:0 0 2px}
-.card .sub{color:var(--muted);font-size:13px;margin-bottom:14px}
-.chart{position:relative;height:220px;display:flex;align-items:flex-end;gap:2px;border-bottom:1px solid var(--line);padding-top:24px}
-.col{flex:1;height:100%;display:flex;align-items:flex-end;cursor:default;position:relative}
-.col i{display:block;width:100%;max-width:38px;margin:0 auto;background:var(--bar);border-radius:4px 4px 0 0;min-height:2px;transition:background .15s}
-.col:hover i{background:var(--bar-h)}
-.col .n{position:absolute;left:0;right:0;text-align:center;font-size:12px;color:var(--muted);font-variant-numeric:tabular-nums}
-.axis{display:flex;gap:2px;margin-top:6px}
-.axis span{flex:1;text-align:center;color:var(--dim);font-size:11px}
-.tip{position:absolute;pointer-events:none;background:#000;border:1px solid var(--line);border-radius:8px;padding:6px 10px;font-size:13px;white-space:nowrap;transform:translate(-50%,-110%);display:none;z-index:2}
+.btn{background:var(--panel2);color:var(--text);border:1px solid var(--line);border-radius:12px;padding:9px 14px;font:inherit;font-weight:700;font-size:13.5px;cursor:pointer;text-decoration:none;display:inline-flex;align-items:center;gap:6px}
+.btn:hover{border-color:#3a3a44}
+.live{display:inline-flex;align-items:center;gap:8px;background:rgba(61,220,151,.1);border:1px solid rgba(61,220,151,.35);color:var(--mint);font-weight:800;border-radius:99px;padding:7px 14px;font-size:13px}
+.live i{width:8px;height:8px;border-radius:50%;background:var(--mint);animation:pl 1.8s infinite}
+@keyframes pl{0%{box-shadow:0 0 0 0 rgba(61,220,151,.6)}70%{box-shadow:0 0 0 9px rgba(61,220,151,0)}}
+/* hero card */
+.hero{display:grid;grid-template-columns:1.2fr 1fr;gap:14px;margin-bottom:14px}
+.big{position:relative;overflow:hidden;background:linear-gradient(135deg,#2a1214,#141418 60%);border:1px solid #3a2226;border-radius:22px;padding:22px;min-height:190px}
+.big .k{color:#e8b4ad;font-weight:700;font-size:13px}
+.big .v{font-size:64px;font-weight:900;line-height:1.05;margin:6px 0 4px;font-variant-numeric:tabular-nums}
+.big .h{color:var(--muted);font-size:13px}
+.big img{position:absolute;right:-10px;bottom:-24px;width:200px;filter:drop-shadow(0 14px 24px rgba(0,0,0,.6))}
+.mini{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.tile{background:var(--panel);border:1px solid var(--line);border-radius:18px;padding:16px;position:relative;overflow:hidden}
+.tile .k{color:var(--muted);font-size:12.5px;font-weight:700;display:flex;align-items:center;gap:8px}
+.tile .k img{width:24px;height:24px;object-fit:contain}
+.tile .v{font-size:32px;font-weight:900;margin-top:6px;font-variant-numeric:tabular-nums}
+.tile .h{color:var(--dim);font-size:12px}
+.grid2{display:grid;grid-template-columns:1.6fr 1fr;gap:14px;margin-bottom:14px}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:20px;padding:18px}
+.card h2{font-size:16px;margin:0 0 2px;font-weight:800}
+.card .s{color:var(--muted);font-size:12.5px;margin-bottom:14px}
+.chart{position:relative;height:230px;display:flex;align-items:flex-end;gap:3px;border-bottom:1px solid var(--line);padding-top:26px}
+.col{flex:1;height:100%;display:flex;align-items:flex-end;position:relative}
+.col i{display:block;width:100%;max-width:30px;margin:0 auto;background:linear-gradient(180deg,var(--sun),var(--bar));border-radius:5px 5px 0 0;min-height:2px;transform-origin:bottom;animation:grow .7s cubic-bezier(.2,1,.3,1) both}
+@keyframes grow{from{transform:scaleY(0)}}
+.col:hover i{filter:brightness(1.25)}
+.col .n{position:absolute;left:0;right:0;text-align:center;font-size:11.5px;color:var(--muted);font-weight:700}
+.axis{display:flex;gap:3px;margin-top:6px}
+.axis span{flex:1;text-align:center;color:var(--dim);font-size:10.5px}
+.tip{position:absolute;pointer-events:none;background:#000;border:1px solid var(--line);border-radius:8px;padding:6px 10px;font-size:12.5px;white-space:nowrap;transform:translate(-50%,-115%);display:none;z-index:2}
+.bars{display:flex;flex-direction:column;gap:12px}
+.bar .r{display:flex;align-items:center;gap:10px;font-size:13.5px;font-weight:700;margin-bottom:5px}
+.bar .r img{width:26px;height:26px;object-fit:contain}
+.bar .r b{margin-left:auto;font-variant-numeric:tabular-nums}
+.bar .tr{height:8px;background:var(--panel2);border-radius:9px;overflow:hidden}
+.bar .tr i{display:block;height:100%;border-radius:9px;background:linear-gradient(90deg,var(--accent),var(--sun));width:0;transition:width 1s cubic-bezier(.2,1,.3,1)}
+.funnel{display:flex;gap:10px;flex-wrap:wrap}
+.funnel div{flex:1 1 140px;background:var(--panel2);border-radius:14px;padding:12px}
+.funnel b{display:block;font-size:22px;font-weight:900}
+.funnel span{color:var(--muted);font-size:12px}
+details summary{cursor:pointer;color:var(--muted);font-size:12.5px;margin-top:12px}
 table{width:100%;border-collapse:collapse;font-variant-numeric:tabular-nums}
-td,th{padding:6px 4px;border-bottom:1px solid var(--line);text-align:left;font-size:14px}
+td,th{padding:6px 4px;border-bottom:1px solid var(--line);text-align:left;font-size:13px}
 th{color:var(--muted);font-weight:600}
 td:last-child,th:last-child{text-align:right}
-details summary{cursor:pointer;color:var(--muted);font-size:13px;margin-top:12px}
 .row{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
-.note{color:var(--muted);font-size:13px}
-.ok{color:#3ddc97}.err{color:var(--bar)}
-@media (max-width:560px){.tile .v{font-size:28px}.axis span:nth-child(even){visibility:hidden}}
+.note{color:var(--muted);font-size:12.5px}
+.ok{color:var(--mint)}.err{color:var(--bar)}
+@media (max-width:860px){.hero,.grid2{grid-template-columns:1fr}.big .v{font-size:52px}.big img{width:150px}}
+@media (max-width:520px){.mini{grid-template-columns:1fr 1fr}.tile .v{font-size:26px}.axis span:nth-child(odd){visibility:hidden}}
 </style>
 </head>
 <body>
-<div class="wrap">
+<div class="lock" id="lock">
+  <form id="lf" autocomplete="off">
+    <img src="img/mega.webp" alt="">
+    <h1>Админка ТЮЛЕНЬ ДРОП</h1>
+    <p>Мега-Тюлень пускает только хозяина</p>
+    <input type="password" id="pw" placeholder="Пароль" autofocus>
+    <button>Войти</button>
+    <div class="err" id="perr"></div>
+  </form>
+</div>
+
+<div class="wrap hidden" id="app">
   <header>
-    <img src="img/i_crown.webp" alt="">
-    <h1>Админка <b>ТЮЛЕНЬ ДРОП</b></h1>
+    <img class="logo" src="img/i_crown.webp" alt="">
+    <div><h1 class="t">Админка <b>ТЮЛЕНЬ ДРОП</b></h1><div class="sub" id="upd">загружаю…</div></div>
     <span class="sp"></span>
-    <span class="note" id="upd"></span>
-    <button id="ref">Обновить</button>
-    <a class="lnk" href="./">На сайт</a>
+    <span class="live"><i></i><span id="onNow">—</span> онлайн сейчас</span>
+    <button class="btn" id="ref">Обновить</button>
+    <a class="btn" href="./">На сайт</a>
+    <button class="btn" id="out">Выйти</button>
   </header>
 
-  <div class="tiles">
-    <div class="tile"><div class="k">Сегодня зашло людей</div><div class="v" id="t_today">—</div><div class="h">уникальных за день</div></div>
-    <div class="tile"><div class="k">Всего людей</div><div class="v" id="t_uniq">—</div><div class="h">разных устройств за всё время</div></div>
-    <div class="tile"><div class="k">Всего заходов</div><div class="v" id="t_visits">—</div><div class="h">открытий страницы</div></div>
-    <div class="tile"><div class="k">Открыто кейсов</div><div class="v" id="t_cases">—</div><div class="h">все игроки вместе</div></div>
-    <div class="tile"><div class="k">Удачных апгрейдов</div><div class="v" id="t_upg">—</div><div class="h">все игроки вместе</div></div>
-  </div>
-
-  <div class="card">
-    <h2>Люди по дням</h2>
-    <div class="sub">Уникальные посетители за последние 14 дней</div>
-    <div class="chart" id="chart"><div class="tip" id="tip"></div></div>
-    <div class="axis" id="axis"></div>
-    <details><summary>Показать таблицей</summary><table><thead><tr><th>День</th><th>Людей</th></tr></thead><tbody id="tbl"></tbody></table></details>
-  </div>
-
-  <div class="card">
-    <h2>Мои заходы</h2>
-    <div class="sub">Чтобы ты сам не накручивал статистику, отключи подсчёт на своих устройствах (на каждом телефоне/компе отдельно).</div>
-    <div class="row"><button id="me"></button><span class="note" id="meSt"></span></div>
-  </div>
-
-  <div class="card">
-    <h2>Ещё статистика</h2>
-    <div class="sub">Сколько людей нашли сайт через поиск Google и по каким словам.</div>
-    <div class="row">
-      <a class="lnk" href="https://search.google.com/search-console/performance/search-analytics?resource_id=https%3A%2F%2Fvana09179-hash.github.io%2F" target="_blank" rel="noopener">Google Search Console</a>
+  <div class="hero">
+    <div class="big">
+      <div class="k">Сегодня зашло людей</div>
+      <div class="v" id="t_today">—</div>
+      <div class="h" id="t_cmp">&nbsp;</div>
+      <img src="img/mega.webp" alt="">
+    </div>
+    <div class="mini">
+      <div class="tile"><div class="k"><img src="img/s_cosmo.webp" alt="">Всего людей</div><div class="v" id="t_uniq">—</div><div class="h">разных устройств</div></div>
+      <div class="tile"><div class="k"><img src="img/i_net.webp" alt="">Всего заходов</div><div class="v" id="t_visits">—</div><div class="h">открытий страницы</div></div>
+      <div class="tile"><div class="k"><img src="img/c_fish.webp" alt="">Открыто кейсов</div><div class="v" id="t_cases">—</div><div class="h">все игроки</div></div>
+      <div class="tile"><div class="k"><img src="img/i_star.webp" alt="">За 14 дней</div><div class="v" id="t_14">—</div><div class="h">людей суммарно</div></div>
     </div>
   </div>
-  <p class="note">Счётчик считает браузеры: один человек с телефона и с компа = 2 человека. Заходы с localhost не считаются.</p>
+
+  <div class="grid2">
+    <div class="card">
+      <h2>Люди по дням</h2>
+      <div class="s">Уникальные посетители за 14 дней</div>
+      <div class="chart" id="chart"><div class="tip" id="tip"></div></div>
+      <div class="axis" id="axis"></div>
+      <details><summary>Показать таблицей</summary><table><thead><tr><th>День</th><th>Людей</th></tr></thead><tbody id="tbl"></tbody></table></details>
+    </div>
+    <div class="card">
+      <h2>Во что играют</h2>
+      <div class="s">Сколько раз запускали каждый режим</div>
+      <div class="bars" id="bars"></div>
+    </div>
+  </div>
+
+  <div class="card" style="margin-bottom:14px">
+    <h2>Воронка</h2>
+    <div class="s">Сколько людей доходит до игры</div>
+    <div class="funnel" id="funnel"></div>
+  </div>
+
+  <div class="grid2">
+    <div class="card">
+      <h2>Мои заходы</h2>
+      <div class="s">Отключи подсчёт на своих устройствах, чтобы не накручивать статистику.</div>
+      <div class="row"><button class="btn" id="me"></button><span class="note" id="meSt"></span></div>
+    </div>
+    <div class="card">
+      <h2>Поиск Google</h2>
+      <div class="s">Сколько людей нашли сайт в поиске и по каким словам.</div>
+      <a class="btn" href="https://search.google.com/search-console/performance/search-analytics?resource_id=https%3A%2F%2Fvana09179-hash.github.io%2F" target="_blank" rel="noopener">Открыть Search Console</a>
+    </div>
+  </div>
+  <p class="note">Один человек с телефона и с компа = 2 устройства. Заходы с localhost не считаются.</p>
 </div>
 <script>
 (function(){
+var H='7ea6910c859a5899bef1b29f40265b48601e495b38c7da81b5606dd8c85926aa';
 var API='https://abacus.jasoncameron.dev/get/td-k7q2x9/';
 var $=function(id){return document.getElementById(id)};
+function ss(k,v){try{if(v===undefined)return sessionStorage.getItem(k);if(v===null)sessionStorage.removeItem(k);else sessionStorage.setItem(k,v)}catch(e){}}
+async function sha(t){var b=await crypto.subtle.digest('SHA-256',new TextEncoder().encode(t));return [...new Uint8Array(b)].map(function(x){return x.toString(16).padStart(2,'0')}).join('')}
+function unlock(){$('lock').classList.add('hidden');$('app').classList.remove('hidden');meUI();load()}
+$('lf').onsubmit=async function(e){e.preventDefault();var h=await sha('td-salt:'+$('pw').value);
+  if(h===H){ss('td_adm',H);unlock()}else{$('perr').textContent='Неверный пароль';var l=$('lock');l.classList.remove('shake');void l.offsetWidth;l.classList.add('shake');$('pw').select()}};
+$('out').onclick=function(){ss('td_adm',null);location.reload()};
+
 function get(k){return fetch(API+k).then(function(r){return r.status===404?{value:0}:r.json()}).then(function(j){return j.value||0}).catch(function(){return null})}
 function fmt(n){return n==null?'?':n.toLocaleString('ru-RU')}
 function key(d){return d.getFullYear()+('0'+(d.getMonth()+1)).slice(-2)+('0'+d.getDate()).slice(-2)}
+function anim(el,to){if(to==null){el.textContent='?';return}var t0=performance.now();(function f(t){var k=Math.min(1,(t-t0)/900);el.textContent=fmt(Math.round(to*(1-Math.pow(1-k,3))));if(k<1)requestAnimationFrame(f)})(t0)}
 var days=[];for(var i=13;i>=0;i--){var d=new Date();d.setDate(d.getDate()-i);days.push(d)}
-function load(){
+var MODES=[['cases','Кейсы','c_fish'],['upg','Апгрейды (удачные)','i_up'],['contract','Контракты','i_crown'],['battle','Битвы кейсов','i_fire'],['wheel','Колесо бонуса','i_star'],['gift','Подарки новичкам','c_gift']];
+async function seq(keys){var out=[];for(var i=0;i<keys.length;i+=6){var part=await Promise.all(keys.slice(i,i+6).map(get));out=out.concat(part)}return out}
+async function load(){
   $('upd').textContent='загружаю…';
-  var tot=['visits','uniq','cases','upg'];
-  Promise.all(tot.map(get)).then(function(v){
-    $('t_visits').textContent=fmt(v[0]);$('t_uniq').textContent=fmt(v[1]);$('t_cases').textContent=fmt(v[2]);$('t_upg').textContent=fmt(v[3]);
-    return Promise.all(days.map(function(d){return get('d-'+key(d))}));
-  }).then(function(vals){
-    $('t_today').textContent=fmt(vals[vals.length-1]);
-    draw(vals);
-    var bad=vals.some(function(x){return x==null});
-    $('upd').innerHTML=bad?'<span class="err">часть данных не загрузилась — нажми «Обновить»</span>':'обновлено '+new Date().toLocaleTimeString('ru-RU',{hour:'2-digit',minute:'2-digit'});
-  });
+  var b=Math.floor(Date.now()/12e4);
+  var tot=await seq(['visits','uniq','on-'+b,'on-'+(b-1)].concat(MODES.map(function(m){return m[0]})));
+  var dv=await seq(days.map(function(d){return 'd-'+key(d)}));
+  anim($('t_visits'),tot[0]);anim($('t_uniq'),tot[1]);
+  $('onNow').textContent=fmt(Math.max(tot[2]||0,Math.round((tot[3]||0)*.7)));
+  var mv=tot.slice(4);anim($('t_cases'),mv[0]);
+  var today=dv[13],yest=dv[12];anim($('t_today'),today);
+  $('t_cmp').innerHTML=yest==null?'&nbsp;':(today>=yest?'<span class="ok">▲ ':'<span class="err">▼ ')+'вчера было '+fmt(yest)+'</span>';
+  anim($('t_14'),dv.reduce(function(a,v){return a+(v||0)},0));
+  draw(dv);
+  var mx=Math.max.apply(null,mv.map(function(v){return v||0}).concat([1]));
+  $('bars').innerHTML=MODES.map(function(m,i){return '<div class="bar"><div class="r"><img src="img/'+m[2]+'.webp" alt="">'+m[1]+'<b>'+fmt(mv[i])+'</b></div><div class="tr"><i data-w="'+((mv[i]||0)/mx*100)+'"></i></div></div>'}).join('');
+  requestAnimationFrame(function(){document.querySelectorAll('.bar .tr i').forEach(function(x){x.style.width=x.dataset.w+'%'})});
+  var played=Math.max(mv[0]||0,0),u=tot[1]||0;
+  $('funnel').innerHTML='<div><b>'+fmt(u)+'</b><span>зашли на сайт</span></div><div><b>'+fmt(mv[5])+'</b><span>открыли подарок новичка</span></div><div><b>'+fmt(played)+'</b><span>открытий кейсов</span></div><div><b>'+(u?((played/u).toFixed(1)):'0')+'</b><span>кейсов на одного человека</span></div>';
+  var bad=tot.concat(dv).some(function(x){return x==null});
+  $('upd').innerHTML=bad?'<span class="err">часть данных не загрузилась — нажми «Обновить»</span>':'обновлено в '+new Date().toLocaleTimeString('ru-RU',{hour:'2-digit',minute:'2-digit'});
 }
 function draw(vals){
   var ch=$('chart'),ax=$('axis'),tip=$('tip'),tb=$('tbl');
@@ -114,13 +207,11 @@ function draw(vals){
   var max=Math.max.apply(null,vals.map(function(v){return v||0}).concat([1]));
   vals.forEach(function(v,i){
     var d=days[i],lbl=d.toLocaleDateString('ru-RU',{day:'numeric',month:'short'});
-    var c=document.createElement('div');c.className='col';
-    var h=Math.round((v||0)/max*100);
-    c.innerHTML='<i style="height:'+h+'%"></i>'+(i===vals.length-1||v===max&&v>0?'<span class="n" style="bottom:calc('+h+'% + 4px)">'+fmt(v)+'</span>':'');
+    var c=document.createElement('div');c.className='col';var h=Math.round((v||0)/max*100);
+    c.innerHTML='<i style="height:'+h+'%;animation-delay:'+(i*35)+'ms"></i>'+((i===vals.length-1||(v===max&&v>0))?'<span class="n" style="bottom:calc('+h+'% + 4px)">'+fmt(v)+'</span>':'');
     c.onmouseenter=function(){tip.style.display='block';tip.textContent=lbl+': '+fmt(v)+' чел.';tip.style.left=(c.offsetLeft+c.offsetWidth/2)+'px';tip.style.top=(ch.offsetHeight-ch.offsetHeight*h/100)+'px'};
     c.onmouseleave=function(){tip.style.display='none'};
-    ch.appendChild(c);
-    var s=document.createElement('span');s.textContent=d.getDate();ax.appendChild(s);
+    ch.appendChild(c);var s=document.createElement('span');s.textContent=d.getDate();ax.appendChild(s);
     var tr=document.createElement('tr');tr.innerHTML='<td>'+lbl+'</td><td>'+fmt(v)+'</td>';tb.prepend(tr);
   });
 }
@@ -129,7 +220,8 @@ function meUI(){var off=false;try{off=localStorage.getItem('td_notrack')==='1'}c
   $('meSt').innerHTML=off?'<span class="ok">Это устройство не считается ✓</span>':'Это устройство сейчас считается';}
 $('me').onclick=function(){try{var off=localStorage.getItem('td_notrack')==='1';if(off)localStorage.removeItem('td_notrack');else localStorage.setItem('td_notrack','1')}catch(e){}meUI()};
 $('ref').onclick=load;
-meUI();load();
+if(ss('td_adm')===H)unlock();
+setInterval(function(){if(!$('app').classList.contains('hidden'))load()},12e4);
 })();
 </script>
 </body>
