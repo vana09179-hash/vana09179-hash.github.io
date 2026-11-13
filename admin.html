@@ -386,6 +386,7 @@ h1.hd img{width:44px;vertical-align:middle;margin-left:6px}
     <div class="sec">Аккаунты</div>
     <div class="nav" data-v="acc"><img src="img/i_net.webp" alt="">Аккаунты<span class="tag" id="accN">0</span></div>
     <div class="nav" data-v="cc"><img src="img/i_crown.webp" alt="">Управление<span class="tag">PRO</span></div>
+    <div class="nav" data-v="board"><img src="img/i_net.webp" alt="">Доска<span class="tag">NEW</span></div>
     <div class="nav" data-v="log"><img src="img/i_fire.webp" alt="">Журнал заходов</div>
     <div class="nav" data-v="sys"><img src="img/i_up.webp" alt="">Система<span class="tag" id="sysTag">live</span></div>
     <div class="sec">Другое</div>
@@ -459,6 +460,10 @@ h1.hd img{width:44px;vertical-align:middle;margin-left:6px}
       </div>
     </section>
 
+    <section class="page hidden" id="v-board" style="padding:0">
+      <iframe id="boardFr" title="Доска" style="width:100%;height:calc(100vh - 90px);min-height:520px;border:1px solid rgba(255,255,255,.08);border-radius:16px;background:#121316;display:block"></iframe>
+    </section>
+
     <section class="page hidden" id="v-sys">
       <div class="row rv"><div class="ttl"><small>◷ Проверяется каждые 30 секунд</small><b>Система</b></div><div class="chips"><button class="btn" id="sysRef">Проверить сейчас</button></div></div>
       <div class="svcs" id="svcs"></div>
@@ -496,11 +501,11 @@ $('lf').onsubmit=async function(e){e.preventDefault();var h=await sha('td-salt:'
   if(h===H){ss('td_adm',H);ss('td_admk',$('pw').value);unlock()}else{$('perr').textContent='Неверный пароль';var l=$('lock');l.classList.remove('shake');void l.offsetWidth;l.classList.add('shake');$('pw').select()}};
 $('out').onclick=function(){ss('td_adm',null);ss('td_admk',null);location.reload()};
 
-var VIEW='dash',NAMES={dash:'Дашборд',acc:'Аккаунты',cc:'Центр управления',log:'Журнал заходов',sys:'Система',set:'Настройки'};
+var VIEW='dash',NAMES={dash:'Дашборд',acc:'Аккаунты',cc:'Центр управления',board:'Доска',log:'Журнал заходов',sys:'Система',set:'Настройки'};
 function go(v){VIEW=v;document.querySelectorAll('.nav[data-v]').forEach(function(n){n.classList.toggle('on',n.dataset.v===v)});
-  ['dash','acc','cc','log','sys','set'].forEach(function(x){$('v-'+x).classList.toggle('hidden',x!==v)});$('crumb').textContent=NAMES[v];
+  ['dash','acc','cc','board','log','sys','set'].forEach(function(x){$('v-'+x).classList.toggle('hidden',x!==v)});$('crumb').textContent=NAMES[v];
   $('v-'+v).querySelectorAll('.rv').forEach(function(el){el.style.animation='none';void el.offsetWidth;el.style.animation=''});
-  if(v==='acc')drawGraph();if(v==='cc')drawCC();if(v==='sys')drawSys();scrollTo({top:0,behavior:'smooth'})}
+  if(v==='acc')drawGraph();if(v==='cc')drawCC();if(v==='sys')drawSys();if(v==='board'&&!$('boardFr').src)$('boardFr').src='board/index.html';scrollTo({top:0,behavior:'smooth'})}
 document.querySelectorAll('.nav[data-v]').forEach(function(n){n.onclick=function(){go(n.dataset.v)}});
 $('gsearch').oninput=function(){if(VIEW!=='acc')go('acc');else drawGraph()};
 
