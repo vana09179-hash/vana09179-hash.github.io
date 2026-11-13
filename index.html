@@ -741,6 +741,25 @@ html.lite .hero-vid{display:none}
 .banscr h2{font-size:34px;margin:10px 0 6px;font-weight:900;color:#ff6f59}
 .banscr p{color:#c8c4d0;max-width:420px;margin:0 auto}
 @keyframes bob{50%{transform:translateY(-8px)}}
+
+/* economy: баланс, продажа */
+.balp{display:flex;align-items:center;gap:8px;background:var(--surface);border:1px solid var(--line);border-radius:99px;padding:7px 14px;font-weight:800;font-size:14px;white-space:nowrap;font-variant-numeric:tabular-nums}
+.balp img{width:20px;height:20px;object-fit:contain}
+.balp.pop{animation:balpop .5s cubic-bezier(.2,1.6,.4,1)}
+@keyframes balpop{40%{transform:scale(1.15);border-color:var(--sun)}}
+.balp.bad{animation:shake .4s;border-color:var(--accent)}
+.cc-price .fr{color:var(--mint);font-weight:800}
+#sell{display:none}#sell.on{display:inline-flex}
+.inv-hint{color:var(--muted);font-size:12px;margin:-6px 0 8px}
+
+.caser{display:inline-block;margin-left:10px;font-size:11px;font-weight:800;letter-spacing:.06em;text-transform:uppercase;padding:3px 10px;border-radius:99px;color:var(--c);border:1px solid color-mix(in srgb,var(--c) 45%,transparent);background:color-mix(in srgb,var(--c) 14%,rgba(0,0,0,.4))}
+.cc-cat .trc{font-style:normal;font-weight:800}
+.sellbar{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px}
+.sellbar .btn-soft{padding:9px 14px;font-size:13px}
+.sellgrid{grid-template-columns:repeat(auto-fill,minmax(96px,1fr))}
+.sellgrid .card{cursor:pointer}
+.sellgrid .card .odds{left:6px;right:auto;color:var(--mint)}
+.sell-empty{color:var(--muted);padding:30px;text-align:center;width:100%}
 </style>
 </head>
 <body>
@@ -772,6 +791,7 @@ html.lite .hero-vid{display:none}
       <button class="mode" data-mode="contract"><img class="ico3d" src="img/i_crown.webp" alt="">Контракты</button>
       <button class="mode" data-mode="battle"><img class="ico3d" src="img/i_fire.webp" alt="">Битва кейсов</button>
       <button class="mode" data-mode="wheel"><img class="ico3d" src="img/i_star.webp" alt="">Колесо бонуса</button>
+      <button class="mode" data-mode="sell"><img class="ico3d" src="img/i_shell.webp" alt="">Продажа</button>
       <button class="side-link" data-go="inv"><img class="ico3d" src="img/i_net.webp" alt="">Мой улов</button>
       <a class="side-link" href="https://send.monobank.ua/jar/427ZsEkWhH" target="_blank" rel="noopener noreferrer"><svg class="ico" viewBox="0 0 24 24"><path d="M12 20s-7-4.4-7-10a4 4 0 0 1 7-2.6A4 4 0 0 1 19 10c0 5.6-7 10-7 10z"/></svg>Поддержать</a>
     </nav>
@@ -816,7 +836,7 @@ html.lite .hero-vid{display:none}
       <div class="h-kicker">Акция недели · 66 тюленей и рыбок</div>
       <h1 class="h-title">Кейс «Большая рыбка»<br><span>с Мега-Тюленем внутри</span></h1>
       <p class="h-sub">Открывай кейсы, собирай пухлых тюленей и апгрейдь карася до Алмазного тюленя. Честный рандом, без подкрутки.</p>
-      <div class="h-price"><s>999<img class="shell3d" src="img/i_shell.webp" alt="ракушек"></s> Бесплатно <em>−100%</em></div>
+      <div class="h-price">Старт — <b>бесплатные кейсы</b> <em>0 ракушек</em></div>
       <div class="h-btns">
         <button class="btn-main h-cta h-pulse" id="heroOpen">Открыть кейс бесплатно</button>
         <button class="btn-ghost2" id="heroUp"><img class="btn-up3d" src="img/i_up.webp" alt="">Апгрейдер</button>
@@ -844,6 +864,7 @@ html.lite .hero-vid{display:none}
       <button class="mchip" data-mode="contract"><img src="img/i_crown.webp" alt=""><span>Контракты<span class="new">NEW</span><small>3–10 рыбок → 1 крутая</small></span></button>
       <button class="mchip" data-mode="battle"><img src="img/i_fire.webp" alt=""><span>Битва кейсов<span class="new">NEW</span><small>ты против ботов</small></span></button>
       <button class="mchip" data-mode="wheel"><img src="img/i_star.webp" alt=""><span>Колесо бонуса<span class="new">NEW</span><small>бесплатно раз в день</small></span></button>
+      <button class="mchip" data-mode="sell"><img src="img/i_shell.webp" alt=""><span>Продажа<small>улов → ракушки</small></span></button>
     </div>
     <div class="toolbar">
       <div class="chips" id="chips">
@@ -864,7 +885,7 @@ html.lite .hero-vid{display:none}
       <div class="case-meta">
         <h2 id="caseName">Кейс «Большая рыбка»</h2>
         <p id="caseDesc">Внутри — улов всего океана. Тюлени одобряют.</p>
-        <div class="price">БЕСПЛАТНО <s id="casePrice">999<img class="shell3d" src="img/i_shell.webp" alt="ракушек"></s></div>
+        <div class="price" id="priceLine">БЕСПЛАТНО <s id="casePrice">999<img class="shell3d" src="img/i_shell.webp" alt="ракушек"></s></div>
       </div>
     </div>
     <div class="stage">
@@ -982,6 +1003,11 @@ html.lite .hero-vid{display:none}
     </div>
   </section>
 
+  <section class="view" id="view-sell">
+    <div class="mhead"><img src="img/i_shell.webp" alt=""><div><h2>Продажа</h2><p>Продавай тюленей и рыбок за ракушки. Цена вдвое ниже ценности предмета.</p></div></div>
+    <div class="mpanel"><div class="sellbar" id="sellBar"></div><div class="up-list sellgrid" id="sellGrid"></div></div>
+  </section>
+
   <section>
     <h3 class="sec-title">Мой улов <small id="invSum"></small></h3>
     <div class="inv-row" id="inv"><div class="inv-empty">Пока пусто. Крути — океан щедрый!</div></div>
@@ -1020,6 +1046,7 @@ html.lite .hero-vid{display:none}
   <button data-mode="up"><img class="ico3d" src="img/i_up.webp" alt="">Апгрейд</button>
   <button data-mode="battle"><img class="ico3d" src="img/i_fire.webp" alt="">Битва</button>
   <button data-mode="wheel"><img class="ico3d" src="img/i_star.webp" alt="">Бонус</button>
+  <button data-mode="sell"><img class="ico3d" src="img/i_shell.webp" alt="">Продажа</button>
   <button data-mode="inv"><img class="ico3d" src="img/i_net.webp" alt="">Улов</button>
 </nav>
 
@@ -1053,6 +1080,7 @@ html.lite .hero-vid{display:none}
     <div class="m-rar" id="mRar"></div>
     <div class="m-btns">
       <button class="btn-gold" id="take">Забрать</button>
+      <button class="btn-ghost" id="sell">Продать</button>
       <button class="btn-ghost" id="again">Крутить ещё</button>
     </div>
   </div>
@@ -1180,6 +1208,14 @@ const CASES=[
   C('pro','c_pro','Тюлени-профи','Ниндзя, самураи, хакеры и фараоны.',1299,'#3bffc8',['new','prem'],['g_pharaoh','g_astro','g_samurai','g_hero','g_ninja','g_hacker','g_dj','g_detective','g_doctor','g_fireman','okun','kilka','sardinka'],'NEW'),
   C('stars','c_stars','Тюлени-звёзды','Рокеры, маги и чемпионы. Только тюлени!',777,'#ff7ad9',['new','pop'],['s_rainbow','s_cosmo','s_champ','s_rocker','s_fire','s_mage','s_rapper','s_zombie','s_xmas','s_barista','s_pink','s_choco','okun','sardinka'],'NEW'),
 ];
+/* экономика кейсов: цены по реальному дропу, бесплатные — без дорогих тюленей */
+(function(){const OK=['common','ind','sec'];
+  const free=CASES.filter(c=>c.p<=50),paid=CASES.filter(c=>c.p>50).sort((a,b)=>a.p-b.p);
+  free.forEach(c=>{c.luck=.8;c.items=c.items.filter(k=>OK.includes(I[k].r));
+    ['sardinka','bychok','shprota','mojva','okun','seld','karas','nerpa','spyashiy','losos','forel','fugu'].forEach(k=>{if(c.items.length<9&&!c.items.includes(k))c.items.push(k)});c.p=0});
+  paid.forEach((c,i)=>{c.luck=.9+1.1*i/Math.max(1,paid.length-1)});
+  paid.forEach(c=>{const ev=caseOdds(c).reduce((a,[it,q])=>a+it.v*q/100,0);c.p=Math.max(60,Math.round(ev*.5/.8/5)*5)})})();
+function caseTier(cs){return cs.p<=50?'common':cs.p<150?'ind':cs.p<300?'sec':cs.p<450?'cov':'gold'}
 // sprinkle the new seal skins into the existing cases so every case feels fresh
 {const add={space:['g_astro'],gamer:['g_hacker','g_dj'],club:['g_dj'],pirate:['g_ninja'],morzh:['g_samurai'],gold:['g_pharaoh'],diamond:['g_pharaoh'],fish:['g_hero'],chef:['g_doctor'],lava:['g_fireman'],ghost:['g_detective']};
  for(const cs of CASES)for(const k of (add[cs.id]||[]))if(!cs.items.includes(k))cs.items.push(k)}
@@ -1189,8 +1225,9 @@ const CASES=[
 let CUR=CASES[0];
 function caseOdds(cs){
   const its=cs.items.map(k=>I[k]),cnt={};its.forEach(it=>cnt[it.r]=(cnt[it.r]||0)+1);
-  const tot=Object.keys(cnt).reduce((a,r)=>a+T_ODDS[r],0);
-  return its.map(it=>[it,T_ODDS[it.r]/tot/cnt[it.r]*100]);
+  const RK={common:0,ind:1,sec:2,cov:3,gold:4},L=cs.luck||1,W=r=>T_ODDS[r]*Math.pow(L,RK[r]);
+  const tot=Object.keys(cnt).reduce((a,r)=>a+W(r),0);
+  return its.map(it=>[it,W(it.r)/tot/cnt[it.r]*100]);
 }
 function pickWeighted(cs){const o=caseOdds(cs);let r=Math.random()*100;for(const [it,p] of o){if((r-=p)<=0)return it}return o[o.length-1][0]}
 function iconHTML(it,s){
@@ -1412,6 +1449,7 @@ function flick(){pointer.classList.remove('flick');void pointer.offsetWidth;poin
 async function spinCase(){
   if(busy)return;
   if(!USER)guestLogin();
+  if(!payCase())return;
   busy=true;A.init();spinBtn.disabled=true;
   // case "unlocks": shakes, glows and pops before the strip starts
   const cb=$('#caseBox');cb.classList.remove('opening');void cb.offsetWidth;cb.classList.add('opening');A.whoosh();
@@ -1581,7 +1619,7 @@ if(!topDrop)setTopDrop(rnd(POOL.gold),rnd(NAMES));
 function show(m){
   mode=m;
   document.querySelectorAll('.mode,.bnav button').forEach(x=>x.classList.toggle('active',x.dataset.mode===(m==='case'?'cases':m)));
-  ['cases','case','up','contract','battle','wheel'].forEach(v=>$('#view-'+v).classList.toggle('active',v===m));
+  ['cases','case','up','contract','battle','wheel','sell'].forEach(v=>$('#view-'+v).classList.toggle('active',v===m));
   if(m==='case')requestAnimationFrame(()=>setX(curX));
   scrollTo({top:0,behavior:'smooth'});
 }
@@ -1589,7 +1627,7 @@ const SECS=[['pop','Популярные','то, что крутят прямо 
 let filt='all';
 function caseCard(cs){const i=CASES.indexOf(cs);
   return `<div class="case-card reveal" data-i="${i}" style="--c:${cs.c}"><div class="cc-img">${cs.tag?`<span class="tag ${cs.tag==='NEW'?'new':''}">${cs.tag}</span>`:''}<img src="img/${cs.img}.webp" alt="${cs.n}" loading="lazy" decoding="async"></div>
-    <div class="cc-info"><span class="cc-cat">${cs.items.length} предметов</span><h4>${cs.n}</h4><div class="cc-price"><s>${fmt(cs.p)}<img class="shell3d" src="img/i_shell.webp" alt="ракушек"></s>Бесплатно</div></div></div>`}
+    <div class="cc-info"><span class="cc-cat">${cs.items.length} предметов · <i class="trc" style="color:${RAR[caseTier(cs)].c}">${RAR[caseTier(cs)].n}</i></span><h4>${cs.n}</h4><div class="cc-price">${casePriceHTML(cs)}</div></div></div>`}
 function renderCases(){
   const q=($('#q').value||'').trim().toLowerCase();
   const ok=cs=>(!q||cs.n.toLowerCase().includes(q)||cs.items.some(k=>I[k].n.toLowerCase().includes(q)));
@@ -1686,7 +1724,7 @@ const _renderCases=renderCases;renderCases=function(){_renderCases();observeReve
 // hero counters
 function countUp(el){const to=+el.dataset.to,t0=performance.now(),d=1600;(function f(t){const k=Math.min(1,(t-t0)/d),v=Math.round(to*(1-Math.pow(1-k,3)));el.textContent=fmt(v);if(k<1)requestAnimationFrame(f)})(t0)}
 document.querySelectorAll('.count').forEach(countUp);
-$('#heroOpen').onclick=()=>{A.init();A.click();openCase(CASES[0]);setTimeout(spinCase,450)};
+$('#heroOpen').onclick=()=>{A.init();A.click();openCase(FREE_CASE());setTimeout(spinCase,450)};
 $('#heroUp').onclick=()=>{A.init();A.click();show('up')};
 // hide the hero on inner pages
 const _show=show;show=function(m){_show(m);$('#hero').style.display=m==='cases'?'':'none'};
@@ -1798,6 +1836,7 @@ $('#ctList').addEventListener('click',e=>{const m=e.target.closest('.card.mini')
 $('#ctClear').onclick=()=>{if(busy)return;A.init();A.click();CT.clear();ctRender()};
 $('#ctBtn').onclick=async()=>{
   const arr=ctItems();if(arr.length<3||busy)return;if(!USER)guestLogin();
+  if(!spend(ctCost(arr),'контракт'))return;
   busy=true;A.init();snd('whoosh');$('#ctBtn').disabled=true;
   const sum=arr.reduce((a,it)=>a+it.v,0);
   const target=sum*(.4+Math.pow(Math.random(),1.8)*2.6);
@@ -1844,7 +1883,7 @@ async function btReel(j,pool,res){
   const sh=st.firstElementChild?st.firstElementChild.offsetHeight||96:96,end=-(N-2)*sh;st.style.transition=`transform ${2.1+j*.25}s cubic-bezier(.12,.8,.2,1)`;st.style.transform=`translateY(${end}px)`;
 }
 $('#btBtn').onclick=async()=>{
-  if(busy)return;if(!USER)guestLogin();busy=true;A.init();A.click();$('#btBtn').disabled=true;$('#btRes').className='bt2-res';
+  if(busy)return;if(!USER)guestLogin();if(!spend(btCost(),'битву'))return;busy=true;A.init();A.click();$('#btBtn').disabled=true;$('#btRes').className='bt2-res';
   const cs=CASES[BT],ps=btPlayers(),n=ps.length,tot=Array(n).fill(0),won=[];btDraw(ps);
   const pool=cs.items.map(k=>I[k]);
   // VS intro
@@ -1987,10 +2026,70 @@ const _swAcc=switchUser;switchUser=function(){_swAcc();setTimeout(tdSync,1200)};
 const _celAcc=celebrate;celebrate=function(a,b,c,d){_celAcc(a,b,c,d);accSoon()};
 const _riAcc=removeInv;removeInv=function(it){_riAcc(it);accSoon()};
 setTimeout(tdSync,2500);setInterval(tdSync,60000);
+
+/* ================= ЭКОНОМИКА: ракушки ================= */
+const FREE_MAX=50,SELL_RATE=.5,START_BAL=1000,FREE_PER_HOUR=30;
+const SHELLI='<img class="shell3d" src="img/i_shell.webp" alt="ракушек">';
+const rbOn=()=>typeof isRb==='function'&&isRb();
+function getBal(){let v=null;try{v=localStorage.getItem('td_bal')}catch(e){}if(v===null){setBal(START_BAL);return START_BAL}return Math.max(0,Math.floor(+v||0))}
+function setBal(v){try{localStorage.setItem('td_bal',String(Math.max(0,Math.floor(v))))}catch(e){}renderBal()}
+function renderBal(pop){const el=document.getElementById('balp');if(!el)return;el.querySelector('b').textContent=fmt(getBal());if(pop){el.classList.remove('pop');void el.offsetWidth;el.classList.add('pop')}}
+function noMoney(need){const el=document.getElementById('balp');if(el){el.classList.remove('bad');void el.offsetWidth;el.classList.add('bad')}
+  try{A.lose&&A.lose()}catch(e){}mjoke(['Не хватает ракушек: нужно '+fmt(need)+', а у тебя '+fmt(getBal()),'Ракушки закончились! Продай лишнее из улова или открой бесплатный кейс'])}
+function spend(n,what){if(rbOn()||n<=0)return true;const b=getBal();if(b<n){noMoney(n);return false}setBal(b-n);return true}
+function isFree(cs){return cs.p<=50}
+function FREE_CASE(){return CASES.filter(isFree).sort((a,b)=>a.p-b.p)[0]||CASES[CASES.length-1]}
+function casePriceHTML(cs){return isFree(cs)?'<span class="fr">Бесплатно</span>':fmt(cs.p)+'<img class="shell3d" src="img/i_shell.webp" alt="ракушек">'}
+function freeHist(){let a=[];try{a=JSON.parse(localStorage.getItem('td_free')||'[]')}catch(e){}const t=Date.now()-36e5;return a.filter(x=>x>t)}
+function payCase(){if(rbOn())return true;const cs=CUR;
+  if(isFree(cs)){const h=freeHist();if(h.length>=FREE_PER_HOUR){const w=Math.ceil((h[0]+36e5-Date.now())/6e4);mjoke(['Бесплатные кейсы: лимит '+FREE_PER_HOUR+' в час. Подожди ~'+w+' мин или открой платный','Тюлени устали! Бесплатный кейс снова через ~'+w+' мин']);return false}
+    h.push(Date.now());try{localStorage.setItem('td_free',JSON.stringify(h))}catch(e){}return true}
+  return spend(cs.p,'кейс')}
+function ctCost(arr){const sum=arr.reduce((a,it)=>a+it.v,0);return Math.max(5,Math.round(sum*3*.1))}
+function btCost(){const cs=CASES[BT];if(isFree(cs))return 0;return Math.round(cs.p*BT_R/BT_OPP)}
+/* баланс в шапке */
+(function(){const a=document.getElementById('authArea');if(!a)return;const el=document.createElement('div');el.className='balp';el.id='balp';el.innerHTML=SHELLI+'<b>0</b>';a.parentNode.insertBefore(el,a.parentNode.querySelector('.onl')||a);renderBal()})();
+/* цены в каталоге и в кейсе */
+const _openCaseE=openCase;openCase=function(cs){_openCaseE(cs);if(rbOn())return;const pl=document.getElementById('priceLine');
+  if(pl)pl.innerHTML=(isFree(cs)?'<span class="fr">БЕСПЛАТНО</span>':'ЦЕНА <b>'+fmt(cs.p)+'</b>'+SHELLI)+' <span class="caser" style="--c:'+RAR[caseTier(cs)].c+'">'+RAR[caseTier(cs)].n+'</span>';
+  spinBtn.textContent=isFree(cs)?'КРУТИТЬ БЕСПЛАТНО':'КУПИТЬ И КРУТИТЬ · '+fmt(cs.p)};
+/* контракты и битвы: подпись цены на кнопке */
+function ctCostUI(){const b=document.getElementById('ctBtn');if(!b)return;const arr=ctItems();b.innerHTML=arr.length>=3?'Подписать · '+fmt(ctCost(arr))+SHELLI:'Подписать контракт'}
+const _ctrE=ctRender;ctRender=function(){_ctrE();ctCostUI()};
+function btCostUI(){const b=document.getElementById('btBtn');if(!b||busy)return;const c=btCost();b.innerHTML=c?'В бой! · '+fmt(c)+SHELLI:'В бой! · бесплатно'}
+document.getElementById('view-battle').addEventListener('click',()=>setTimeout(btCostUI,0));
+const _btiE=btInit;btInit=function(){_btiE();btCostUI()};
+/* продажа предметов */
+function sellVal(it){return Math.max(1,Math.round(it.v*SELL_RATE))}
+function sellOne(it,fromModal){if(!inv.has(it)&&!fromModal)return;if(!fromModal)removeInv(it);setBal(getBal()+sellVal(it),true);
+  try{A.coin&&A.coin()}catch(e){}window.tdLog&&tdLog('продажа',it.n+' +'+sellVal(it))}
+const sellBtn=document.getElementById('sell');
+new MutationObserver(()=>{const show=modal.classList.contains('show')&&modalKind==='case'&&modalItem&&!rbOn();sellBtn.classList.toggle('on',!!show);if(show)sellBtn.innerHTML='Продать · '+fmt(sellVal(modalItem))+SHELLI}).observe(modal,{attributes:true,attributeFilter:['class']});
+sellBtn.onclick=()=>{if(!modalItem)return;const it=modalItem;modalItem=null;sellOne(it,true);closeModal()};
+document.getElementById('inv').addEventListener('click',e=>{const c=e.target.closest('.card');if(!c||busy||rbOn())return;const it=[...inv.keys()].find(x=>x.img===c.querySelector('img').getAttribute('src').replace(/^img\//,'').replace('.webp',''));
+  if(it&&confirm('Продать «'+(it.sn||it.n)+'» за '+fmt(sellVal(it))+' ракушек?'))sellOne(it)});
+
+/* --- вкладка «Продажа» --- */
+const RNAME=r=>RAR[r].n;
+function sellMany(list){let sum=0,n=0;list.forEach(it=>{const c=inv.get(it)||0;for(let k=0;k<c;k++){removeInv(it);sum+=sellVal(it);n++}});
+  if(sum){setBal(getBal()+sum,true);try{A.coin&&A.coin()}catch(e){}window.tdLog&&tdLog('продажа',n+' шт. +'+sum);mjoke(['Продано '+n+' шт. за '+fmt(sum)+' ракушек'])}}
+function renderSell(){const g=document.getElementById('sellGrid'),bar=document.getElementById('sellBar');if(!g)return;
+  const items=[...inv].sort((a,b)=>b[0].v-a[0].v);
+  if(!items.length){g.innerHTML='<div class="sell-empty">Улов пуст — открой кейс, и здесь появятся тюлени и рыбки на продажу</div>';bar.innerHTML='';return}
+  g.innerHTML=items.map(([it,n])=>mini(it,'s',false,`<span class="cnt">×${n}</span><span class="odds">${fmt(sellVal(it))}</span>`)).join('');
+  const by={};items.forEach(([it,n])=>{(by[it.r]=by[it.r]||[]).push(it)});
+  const tot=items.reduce((a,[it,n])=>a+sellVal(it)*n,0);
+  bar.innerHTML=Object.keys(by).map(r=>{const l=by[r],s2=l.reduce((a,it)=>a+sellVal(it)*(inv.get(it)||0),0);return `<button class="btn-soft" data-sr="${r}" style="border-color:${RAR[r].c}66">Продать всё · ${RNAME(r)} · +${fmt(s2)}</button>`}).join('')+`<button class="btn-main" data-sr="all" style="padding:9px 16px;font-size:13px">Продать всё · +${fmt(tot)}</button>`}
+document.getElementById('sellGrid').addEventListener('click',e=>{const c=e.target.closest('.card.mini');if(!c||busy)return;const it=I[c.dataset.key];if(it)sellOne(it)});
+document.getElementById('sellBar').addEventListener('click',e=>{const b=e.target.closest('[data-sr]');if(!b||busy)return;const r=b.dataset.sr;
+  const list=[...inv.keys()].filter(it=>r==='all'||it.r===r);if(r==='all'&&!confirm('Продать весь улов?'))return;sellMany(list)});
+const _riS=renderInv;renderInv=function(f){_riS(f);if(typeof mode!=='undefined'&&mode==='sell')renderSell()};
+const _shS=show;show=function(m){_shS(m);if(m==='sell')renderSell()};
+renderBal();
 /* онбординг: подарок новичку + плавающая кнопка */
 addEventListener('DOMContentLoaded',function(){
   const fc=$('#fcta');
-  fc.onclick=()=>{A.init();A.click();openCase(CASES[0]);setTimeout(spinCase,450)};
+  fc.onclick=()=>{A.init();A.click();openCase(FREE_CASE());setTimeout(spinCase,450)};
   let heroVis=true;
   if('IntersectionObserver' in window)new IntersectionObserver(es=>{heroVis=es[0].isIntersecting;upd()},{threshold:0}).observe($('#hero'));
   function upd(){fc.classList.toggle('on',!heroVis&&mode==='cases'&&!busy)}
