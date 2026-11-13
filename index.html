@@ -1568,7 +1568,7 @@ const NAMES=['Морской_Котик','Килька228','ТюленьБосс
 function liveItem(){const r=Math.random();return rnd(POOL[r<.03?'gold':r<.1?'cov':r<.25?'sec':r<.52?'ind':'common'])}
 function liveCase(){return rnd(CASES)}
 function addLive(it,name,me){const el=document.createElement('div');el.className='lv in'+(me?' me':'');el.style.setProperty('--c',RAR[it.r].c);
-  el.innerHTML=iconHTML(it,40)+`<div><div class="u">${name}</div><div class="n">${it.sn||it.n}</div></div>`;
+  el.innerHTML=iconHTML(it,40)+`<div><div class="u">${esc(name)}</div><div class="n">${it.sn||it.n}</div></div>`;
   const t=$('#live');t.prepend(el);while(t.children.length>18)t.lastChild.remove();
   if(it.r==='gold')setTopDrop(it,name)}
 for(let i=0;i<12;i++)addLive(liveItem(),rnd(NAMES));
@@ -1614,7 +1614,7 @@ $('#bnav').addEventListener('click',e=>{const b=e.target.closest('button');if(!b
   show(b.dataset.mode)});
 var topDrop=null;
 function setTopDrop(it,name){if(topDrop&&topDrop.v>=it.v)return;topDrop=it;
-  $('#topdrop').innerHTML=`<span class="lbl">ТОП ДРОП</span>${iconHTML(it,44)}<div><div class="u">${name}</div><div class="n">${it.sn||it.n}</div></div>`}
+  $('#topdrop').innerHTML=`<span class="lbl">ТОП ДРОП</span>${iconHTML(it,44)}<div><div class="u">${esc(name)}</div><div class="n">${it.sn||it.n}</div></div>`}
 function openCase(cs){
   CUR=cs;lastCenter=null;
   $('#caseBox').style.setProperty('--c',cs.c);
