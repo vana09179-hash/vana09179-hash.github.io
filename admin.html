@@ -282,6 +282,87 @@ h1.hd img{width:44px;vertical-align:middle;margin-left:6px}
 @keyframes hm{0%,100%{transform:scale(1)}50%{transform:scale(1.12)}}
 @media (max-width:1280px){.ccg{grid-template-columns:230px 300px minmax(0,1fr)}.cca{grid-column:1/-1;position:static}}
 @media (max-width:900px){.ccg{grid-template-columns:1fr}.ccn,.cca{position:static}.ldrow .tiles8{grid-template-columns:repeat(4,1fr)}}
+
+/* ui-rules-v3: правила из UI-подсказок (радиус = внутренний + отступ; кнопки 32/44/52; поля 56; шаг 8px) */
+:root{--u:8px}
+.nav{white-space:nowrap}
+.nav .tag{flex:none}
+/* контейнеры: внешний радиус 24 = внутренний 8 + отступ 16 */
+.ccp{padding:16px;border-radius:24px}
+.ccg{gap:16px}
+.ccc{border-radius:8px;padding:12px;margin:0}
+.ccc{animation:ccin .5s cubic-bezier(.2,.8,.2,1) both}
+@keyframes ccin{from{opacity:0;transform:translateX(-14px)}to{opacity:1;transform:none}}
+.ccc .dr{border-radius:4px;padding:8px;overflow:hidden;white-space:nowrap;text-overflow:ellipsis;display:block}
+.ccc .dr span{margin-right:8px}
+.ccs{height:44px;border-radius:8px;padding:0 16px}
+.cctabs{gap:8px;margin:16px 0}
+.cctabs b{height:32px;display:inline-flex;align-items:center;padding:0 16px;border-radius:8px;font-size:14px}
+.cclist{gap:8px}
+.ccf{border-radius:8px;min-height:44px}
+.ccic{border-radius:8px}
+.ccbell,.ccnew{width:44px;height:44px;border-radius:12px}
+.ccav{width:44px;height:44px}
+/* кнопки: 32 / 44 / 52, отступы 16 / 24 / 32 */
+.btn{min-height:44px;padding:0 24px;border-radius:12px;font-size:14px}
+.btn.sm{min-height:32px;padding:0 16px;border-radius:8px;font-size:14px}
+.cca .go{min-height:44px;padding:0 24px;border-radius:12px;font-size:14px}
+.cabtn{min-height:52px;padding:0 32px;border-radius:12px;font-size:16px;margin-top:16px}
+.cca .sq,.ccd .tb button{width:44px;height:44px;border-radius:12px}
+.catabs{flex-wrap:wrap;overflow:visible;gap:8px;margin-bottom:16px}
+.catabs button{height:44px;padding:0 16px;border-radius:12px;font-size:14px}
+.quick{gap:8px;margin-top:8px}.quick b{height:32px;display:inline-flex;align-items:center;padding:0 16px;border-radius:8px;font-size:14px}
+.chip{height:32px;display:inline-flex;align-items:center;padding:0 16px;border-radius:8px;font-size:14px}
+/* формы: поле 56px, шрифт 16, подпись 14, зазоры 8/16/24 */
+.cf{margin-bottom:16px}
+.cf label{font-size:14px;margin-bottom:8px}
+.cf input,.cf select{height:56px;padding:0 16px;font-size:16px;border-radius:12px}
+.cf textarea{min-height:112px;padding:16px;font-size:16px;border-radius:12px}
+.cf2{gap:16px}
+.search{height:44px;border-radius:12px;padding:0 16px}
+/* центральная панель: плитки не вылезают */
+.ccm{grid-template-columns:repeat(auto-fit,minmax(104px,1fr));gap:8px;margin-top:16px}
+.ccm div{padding:16px;border-radius:8px;min-width:0}
+.ccm b{font-size:20px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.ccd h2{font-size:32px;word-break:break-word}
+.ccd .tb{gap:8px;margin-bottom:16px}
+.ccb{border-radius:8px;padding:16px}
+.ccd .tl{gap:8px}
+.ccb p{word-break:break-word;overflow-wrap:anywhere}
+.tiles{gap:8px}.tiles div{border-radius:8px;padding:16px}
+.tiles b{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+/* адаптив: узкие экраны — левая панель сверху полосой, центр получает место */
+@media (max-width:1680px){
+  .ccg{grid-template-columns:300px minmax(0,1fr) 340px}
+  .ccn{grid-column:1/-1;position:static;display:flex;flex-wrap:wrap;align-items:center;gap:8px;padding:12px 16px;border-radius:24px}
+  .ccn .cctop{margin:0 8px 0 0}
+  .ccn .ccsec{display:none}
+  .ccn .ccf{padding:0 16px 0 8px;min-height:44px}
+  .ccn .ccseg{display:none}
+  .cca{position:sticky;top:90px}
+}
+@media (max-width:1180px){
+  .ccg{grid-template-columns:300px minmax(0,1fr)}
+  .cca{grid-column:1/-1;position:static}
+}
+@media (max-width:820px){
+  .ccg{grid-template-columns:1fr}
+  .ccn{display:block}.ccn .ccf{display:flex}
+  .cclist{max-height:none}
+}
+
+/* ui-fix-v4 */
+.top{flex-wrap:wrap;gap:8px 16px}
+.top .search{min-width:0;flex:1 1 180px;max-width:320px}
+.crumb{flex:1 1 auto;min-width:0;white-space:nowrap}
+@media (max-width:640px){
+  .gwrap{aspect-ratio:auto;padding:16px;display:flex;flex-direction:column;gap:8px}
+  .gwrap svg,.gwrap .orb{display:none}
+  .gwrap .cat{position:static;transform:none;width:100%;border-radius:8px}
+  .gwrap .pch{position:static;transform:none;opacity:1;animation:none;white-space:normal;padding:8px 8px 8px 16px;border-radius:8px;background:rgba(255,255,255,.03)}
+  .gwrap .pch::before{left:4px}
+  .gwrap .pch small{font-size:12px}
+}
 </style>
 </head>
 <body>
@@ -304,7 +385,7 @@ h1.hd img{width:44px;vertical-align:middle;margin-left:6px}
     <div class="nav on" data-v="dash"><img src="img/c_fish.webp" alt="">Дашборд</div>
     <div class="sec">Аккаунты</div>
     <div class="nav" data-v="acc"><img src="img/i_net.webp" alt="">Аккаунты<span class="tag" id="accN">0</span></div>
-    <div class="nav" data-v="cc"><img src="img/i_crown.webp" alt="">Центр управления<span class="tag">PRO</span></div>
+    <div class="nav" data-v="cc"><img src="img/i_crown.webp" alt="">Управление<span class="tag">PRO</span></div>
     <div class="nav" data-v="log"><img src="img/i_fire.webp" alt="">Журнал заходов</div>
     <div class="nav" data-v="sys"><img src="img/i_up.webp" alt="">Система<span class="tag" id="sysTag">live</span></div>
     <div class="sec">Другое</div>
