@@ -734,6 +734,13 @@ html.lite .hero-vid{display:none}
 @keyframes cardpop{40%{transform:scale(.95)}}
 .card.gold .rr{background-color:rgba(0,0,0,.55)}
 @media (prefers-reduced-motion:reduce){.card.swipe .swp,.card.swipe{animation:none}}
+
+/* бан-экран и подарок от админа */
+.banscr{position:fixed;inset:0;z-index:9999;display:flex;align-items:center;justify-content:center;background:radial-gradient(circle at 50% 30%,#3a0e12,#0b0b0d 70%);text-align:center;padding:20px}
+.banscr img{width:220px;filter:grayscale(.6) drop-shadow(0 20px 30px rgba(0,0,0,.6));animation:bob 3s ease-in-out infinite}
+.banscr h2{font-size:34px;margin:10px 0 6px;font-weight:900;color:#ff6f59}
+.banscr p{color:#c8c4d0;max-width:420px;margin:0 auto}
+@keyframes bob{50%{transform:translateY(-8px)}}
 </style>
 </head>
 <body>
@@ -1948,6 +1955,31 @@ let idle;function rs(){clearTimeout(idle);pk.classList.remove('on');idle=setTime
 pk.onclick=()=>{pk.classList.remove('on');A.init();openCase(CASES[0]);setTimeout(spinCase,450)};
 // вкладка скучает
 const T0=document.title;document.addEventListener('visibilitychange',()=>{document.title=document.hidden?'Вернись, Мега-Тюлень скучает…':T0});
+
+/* ===== аккаунты: синхронизация с базой, бан, подарки от админа ===== */
+const ACC_URL='https://script.google.com/macros/s/AKfycbweTv_hVb2s-Cm0fQGVUEZh5EXfmN91FHMgijZFiPemo1yXmWnF7ncAAyS9o7sT8idE/exec';
+let accBusy=false,accT=0;
+function accInv(){return [...inv].map(([it,n])=>it.img+':'+n).join(',')}
+function accVal(){let v=0;inv.forEach((n,it)=>v+=it.v*n);return v}
+function showBan(reason){if(document.querySelector('.banscr'))return;const d=document.createElement('div');d.className='banscr';
+  d.innerHTML='<div><img src="img/mega.webp" alt=""><h2>Ты забанен</h2><p>'+esc(reason||'Администратор ограничил доступ к игре для этого аккаунта.')+'</p></div>';document.body.appendChild(d)}
+async function tdSync(){
+  if(!USER||accBusy)return;accBusy=true;
+  try{const g=window.tdGeo||{};
+    const q=new URLSearchParams({act:'sync',id:USER.id,name:USER.name||'',prov:USER.provider||'',inv:accInv().slice(0,2900),val:accVal(),ip:g.ip||'',country:[g.country,g.city].filter(Boolean).join(', ')});
+    const j=await fetch(ACC_URL+'?'+q).then(r=>r.json());
+    if(j.reset){inv.clear();saveInv();renderInv();mjoke&&mjoke(['Администратор обнулил твой улов'])}
+    if(j.gifts&&j.gifts.length){const got=j.gifts.map(k=>I[k]).filter(Boolean);got.forEach(it=>addInv(it));
+      if(got.length){A.coin&&A.coin();toastAch('mega','Подарок от администрации',got.length===1?got[0].n:got.length+' предметов','Уже в твоём улове!')}}
+    if(j.ban){showBan(j.reason);return}
+  }catch(e){}finally{accBusy=false}
+}
+window.tdSync=tdSync;
+function accSoon(){clearTimeout(accT);accT=setTimeout(tdSync,4000)}
+const _swAcc=switchUser;switchUser=function(){_swAcc();setTimeout(tdSync,1200)};
+const _celAcc=celebrate;celebrate=function(a,b,c,d){_celAcc(a,b,c,d);accSoon()};
+const _riAcc=removeInv;removeInv=function(it){_riAcc(it);accSoon()};
+setTimeout(tdSync,2500);setInterval(tdSync,60000);
 /* онбординг: подарок новичку + плавающая кнопка */
 addEventListener('DOMContentLoaded',function(){
   const fc=$('#fcta');
@@ -2010,7 +2042,7 @@ function send(ev,detail){if(off)return;var d={ev:ev,detail:detail||'',player:pla
   try{fetch(URL,{method:'POST',mode:'no-cors',keepalive:true,headers:{'Content-Type':'text/plain'},body:JSON.stringify(d)})}catch(e){}}
 window.tdLog=send;
 if(!off){var c=null;try{c=JSON.parse(sessionStorage.getItem('td_geo'))}catch(e){}
-  var go=function(g){geo=g||{ip:'?',country:'',city:''};try{sessionStorage.setItem('td_geo',JSON.stringify(geo))}catch(e){}var w=q;q=[];w.forEach(function(d){send(d.ev,d.detail)})};
+  var go=function(g){geo=g||{ip:'?',country:'',city:''};window.tdGeo=geo;try{sessionStorage.setItem('td_geo',JSON.stringify(geo))}catch(e){}var w=q;q=[];w.forEach(function(d){send(d.ev,d.detail)})};
   if(c)go(c);else fetch('https://ipwho.is/?fields=ip,country,city').then(function(r){return r.json()}).then(function(j){go({ip:j.ip,country:j.country,city:j.city})}).catch(function(){go(null)});
   send('заход',(document.referrer?'из '+document.referrer.replace(/^https?:\/\//,'').slice(0,60):'напрямую'));}
 })();

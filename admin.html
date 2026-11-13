@@ -89,6 +89,15 @@ td:last-child,th:last-child{text-align:right}
 .log .ev{display:inline-block;padding:2px 8px;border-radius:99px;background:var(--panel2);font-weight:700;font-size:11.5px}
 .log .ip{font-family:ui-monospace,Consolas,monospace;color:var(--sun);cursor:pointer}
 .chip{background:var(--panel2);border:1px solid var(--line);border-radius:99px;padding:5px 10px;font-size:12px;cursor:pointer}
+.pm{position:fixed;inset:0;z-index:20;background:rgba(0,0,0,.7);display:flex;align-items:center;justify-content:center;padding:16px}
+.pmb{background:var(--panel);border:1px solid var(--line);border-radius:20px;padding:20px;width:min(760px,100%);max-height:90vh;overflow:auto}
+.pinv{display:grid;grid-template-columns:repeat(auto-fill,minmax(92px,1fr));gap:8px;margin-top:10px}
+.pinv div{background:var(--panel2);border:1px solid var(--line);border-radius:12px;padding:6px;text-align:center;font-size:11px;position:relative}
+.pinv img{width:56px;height:56px;object-fit:contain;display:block;margin:0 auto 2px}
+.pinv b{position:absolute;top:4px;right:6px;font-size:11px;color:var(--sun)}
+.pick div{cursor:pointer}.pick div:hover{border-color:var(--sun)}
+.st-ban{color:var(--bar);font-weight:800}.st-ok{color:var(--mint);font-weight:700}
+.btn.sm{padding:5px 10px;font-size:12px}
 .ok{color:var(--mint)}.err{color:var(--bar)}
 @media (max-width:860px){.hero,.grid2{grid-template-columns:1fr}.big .v{font-size:52px}.big img{width:150px}}
 @media (max-width:520px){.mini{grid-template-columns:1fr 1fr}.tile .v{font-size:26px}.axis span:nth-child(odd){visibility:hidden}}
@@ -154,6 +163,18 @@ td:last-child,th:last-child{text-align:right}
   </div>
 
   <div class="card" style="margin-bottom:14px">
+    <div class="row" style="justify-content:space-between"><div><h2>Игроки</h2><div class="s" id="plS">Аккаунты из базы: улов, бан, подарки</div></div>
+      <input id="plQ" placeholder="Поиск игрока…" style="background:var(--panel2);border:1px solid var(--line);border-radius:10px;padding:9px 12px;color:var(--text);font:inherit;font-size:13px;min-width:200px"></div>
+    <div style="overflow-x:auto;margin-top:8px"><table class="log"><thead><tr><th>Игрок</th><th>Был</th><th>IP / откуда</th><th>Улов</th><th>Ценность</th><th>Статус</th><th>Действия</th></tr></thead><tbody id="plB"><tr><td colspan="7" class="note">загружаю…</td></tr></tbody></table></div>
+  </div>
+
+  <div class="pm hidden" id="pm"><div class="pmb"><div class="row" style="justify-content:space-between"><h2 id="pmT">Игрок</h2><button class="btn" id="pmX">Закрыть</button></div>
+    <div class="s" id="pmS"></div><div class="pinv" id="pmInv"></div>
+    <h2 style="margin-top:16px">Выдать плюшку</h2><div class="row"><input id="pmFind" placeholder="Найти предмет…" style="flex:1;background:var(--panel2);border:1px solid var(--line);border-radius:10px;padding:9px 12px;color:var(--text);font:inherit;font-size:13px"></div>
+    <div class="pinv pick" id="pmPick"></div>
+    <div class="row" style="margin-top:14px"><button class="btn" id="pmBan">Забанить</button><button class="btn" id="pmReset">Сбросить улов</button><span class="note" id="pmMsg"></span></div></div></div>
+
+  <div class="card" style="margin-bottom:14px">
     <div class="row" style="justify-content:space-between"><div><h2>Кто заходил</h2><div class="s" id="logS">Последние 300 записей: IP, страна, ник и что открыли</div></div>
       <div class="row"><input id="logQ" placeholder="Поиск: IP, ник, город…" style="background:var(--panel2);border:1px solid var(--line);border-radius:10px;padding:9px 12px;color:var(--text);font:inherit;font-size:13px;min-width:200px"><a class="btn" id="logSheet" target="_blank" rel="noopener">Открыть таблицу</a></div></div>
     <div style="overflow-x:auto;margin-top:8px"><table class="log"><thead><tr><th>Время</th><th>IP</th><th>Откуда</th><th>Игрок</th><th>Действие</th><th>Детали</th></tr></thead><tbody id="logB"><tr><td colspan="6" class="note">загружаю…</td></tr></tbody></table></div>
@@ -181,7 +202,7 @@ var API='https://abacus.jasoncameron.dev/get/td-k7q2x9/';
 var $=function(id){return document.getElementById(id)};
 function ss(k,v){try{if(v===undefined)return sessionStorage.getItem(k);if(v===null)sessionStorage.removeItem(k);else sessionStorage.setItem(k,v)}catch(e){}}
 async function sha(t){var b=await crypto.subtle.digest('SHA-256',new TextEncoder().encode(t));return [...new Uint8Array(b)].map(function(x){return x.toString(16).padStart(2,'0')}).join('')}
-function unlock(){$('lock').classList.add('hidden');$('app').classList.remove('hidden');meUI();load();loadLog()}
+function unlock(){$('lock').classList.add('hidden');$('app').classList.remove('hidden');meUI();load();loadLog();loadPl()}
 $('lf').onsubmit=async function(e){e.preventDefault();var h=await sha('td-salt:'+$('pw').value);
   if(h===H){ss('td_adm',H);ss('td_admk',$('pw').value);unlock()}else{$('perr').textContent='Неверный пароль';var l=$('lock');l.classList.remove('shake');void l.offsetWidth;l.classList.add('shake');$('pw').select()}};
 $('out').onclick=function(){ss('td_adm',null);ss('td_admk',null);location.reload()};
@@ -231,7 +252,7 @@ function meUI(){var off=false;try{off=localStorage.getItem('td_notrack')==='1'}c
   $('me').textContent=off?'Снова считать меня':'Не считать мои заходы';
   $('meSt').innerHTML=off?'<span class="ok">Это устройство не считается ✓</span>':'Это устройство сейчас считается';}
 $('me').onclick=function(){try{var off=localStorage.getItem('td_notrack')==='1';if(off)localStorage.removeItem('td_notrack');else localStorage.setItem('td_notrack','1')}catch(e){}meUI()};
-$('ref').onclick=function(){load();loadLog()};
+$('ref').onclick=function(){load();loadLog();loadPl()};
 var LOG='https://script.google.com/macros/s/AKfycbweTv_hVb2s-Cm0fQGVUEZh5EXfmN91FHMgijZFiPemo1yXmWnF7ncAAyS9o7sT8idE/exec',ROWS=[];
 function esc(t){return String(t==null?'':t).replace(/[&<>"]/g,function(c){return{'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]})}
 function loadLog(){var k=ss('td_admk');if(!k){$('logB').innerHTML='<tr><td colspan="6" class="note">Выйди и войди заново, чтобы загрузить журнал</td></tr>';return}
@@ -244,6 +265,29 @@ function drawLog(){var q=($('logQ').value||'').toLowerCase();
   var top=Object.keys(cnt).sort(function(a,b){return cnt[b]-cnt[a]}).slice(0,12);
   $('logIps').innerHTML=top.length?'<span class="note">Частые IP:</span>'+top.map(function(ip){return '<span class="chip" data-ip="'+esc(ip)+'">'+esc(ip)+' ×'+cnt[ip]+'</span>'}).join(''):'';}
 $('logQ').oninput=drawLog;
+/* ===== игроки: база, бан, подарки ===== */
+var PL=[],ITEMS=[],CUR=null;
+fetch('./index.html').then(function(r){return r.text()}).then(function(t){var re=/\b([a-z_]+):\{n:'([^']+)'(?:,sn:'[^']*')?,r:'([a-z]+)'[^}]*?v:(\d+)/g,m;while((m=re.exec(t)))ITEMS.push({k:m[1],n:m[2],r:m[3],v:+m[4]});ITEMS.sort(function(a,b){return b.v-a.v})}).catch(function(){});
+function iname(k){for(var i=0;i<ITEMS.length;i++)if(ITEMS[i].k===k)return ITEMS[i].n;return k}
+function api(q){q.k=ss('td_admk');return fetch(LOG+'?'+new URLSearchParams(q)).then(function(r){return r.json()})}
+function loadPl(){if(!ss('td_admk'))return;api({act:'players'}).then(function(j){if(j.error){$('plB').innerHTML='<tr><td colspan="7" class="err">'+esc(j.error==='no'?'Нет доступа':j.error)+'</td></tr>';return}if(!j.players){$('plB').innerHTML='<tr><td colspan="7" class="err">Обнови развертывание скрипта (новая версия), чтобы включить базу игроков.</td></tr>';return}PL=j.players;$('plS').textContent='Всего аккаунтов: '+PL.length;drawPl()}).catch(function(){$('plB').innerHTML='<tr><td colspan="7" class="err">База не ответила — нажми «Обновить»</td></tr>'})}
+function invOf(p){return String(p[7]||'').split(',').filter(String).map(function(x){var a=x.split(':');return{k:a[0],n:+a[1]||1}})}
+function drawPl(){var q=($('plQ').value||'').toLowerCase();var rs=PL.filter(function(p){return !q||p.join(' ').toLowerCase().indexOf(q)>=0}).sort(function(a,b){return new Date(b[4])-new Date(a[4])});
+  $('plB').innerHTML=rs.length?rs.map(function(p){var cnt=invOf(p).reduce(function(a,x){return a+x.n},0),ban=p[9]==='да';
+    return '<tr><td><b>'+esc(p[1])+'</b><br><span class="note">'+esc(p[2])+' · '+esc(String(p[0]).slice(0,14))+'</span></td><td>'+new Date(p[4]).toLocaleString('ru-RU',{day:'2-digit',month:'2-digit',hour:'2-digit',minute:'2-digit'})+'</td><td><span class="ip">'+esc(p[5])+'</span><br><span class="note">'+esc(p[6])+'</span></td><td>'+cnt+'</td><td>'+fmt(+p[8]||0)+'</td><td>'+(ban?'<span class="st-ban">БАН</span>':'<span class="st-ok">ок</span>')+(p[11]?'<br><span class="note">ждёт подарок</span>':'')+'</td><td><button class="btn sm" data-open="'+esc(p[0])+'">Открыть</button></td></tr>'}).join(''):'<tr><td colspan="7" class="note">Пока нет аккаунтов — появятся, когда игроки зайдут на обновлённый сайт</td></tr>'}
+$('plQ').oninput=drawPl;
+function openPl(id){CUR=PL.filter(function(p){return String(p[0])===String(id)})[0];if(!CUR)return;$('pm').classList.remove('hidden');$('pmMsg').textContent='';
+  $('pmT').textContent=CUR[1];$('pmS').innerHTML='ID '+esc(CUR[0])+' · вход: '+esc(CUR[2])+' · создан '+new Date(CUR[3]).toLocaleDateString('ru-RU')+' · IP <span class="ip">'+esc(CUR[5])+'</span> '+esc(CUR[6])+(CUR[9]==='да'?' · <span class="st-ban">БАН: '+esc(CUR[10])+'</span>':'');
+  var iv=invOf(CUR);$('pmInv').innerHTML=iv.length?iv.map(function(x){return '<div><img src="img/'+esc(x.k)+'.webp" alt="">'+esc(iname(x.k))+(x.n>1?'<b>×'+x.n+'</b>':'')+'</div>'}).join(''):'<span class="note">Улов пуст</span>';
+  $('pmBan').textContent=CUR[9]==='да'?'Разбанить':'Забанить';$('pmFind').value='';drawPick()}
+function drawPick(){var q=($('pmFind').value||'').toLowerCase();$('pmPick').innerHTML=ITEMS.filter(function(it){return !q||it.n.toLowerCase().indexOf(q)>=0}).slice(0,40).map(function(it){return '<div data-give="'+it.k+'" title="Выдать"><img src="img/'+it.k+'.webp" alt="">'+esc(it.n)+'</div>'}).join('')}
+$('pmFind').oninput=drawPick;$('pmX').onclick=function(){$('pm').classList.add('hidden')};
+document.addEventListener('click',function(e){var o=e.target.closest('[data-open]');if(o){openPl(o.dataset.open);return}
+  var g=e.target.closest('[data-give]');if(g&&CUR){$('pmMsg').textContent='выдаю…';api({act:'give',id:CUR[0],items:g.dataset.give}).then(function(j){$('pmMsg').innerHTML=j.ok?'<span class="ok">Выдано: '+esc(iname(g.dataset.give))+'. Игрок получит в течение минуты.</span>':'<span class="err">'+esc(j.error)+'</span>';loadPl()})}});
+$('pmBan').onclick=function(){if(!CUR)return;var isBan=CUR[9]==='да';var reason='';if(!isBan){reason=prompt('Причина бана (игрок её увидит):','Нарушение правил');if(reason===null)return}
+  api(isBan?{act:'unban',id:CUR[0]}:{act:'ban',id:CUR[0],reason:reason}).then(function(j){$('pmMsg').innerHTML=j.ok?'<span class="ok">'+(isBan?'Разбанен':'Забанен')+'</span>':'<span class="err">'+esc(j.error)+'</span>';CUR[9]=isBan?'':'да';CUR[10]=reason;$('pmBan').textContent=isBan?'Забанить':'Разбанить';loadPl()})};
+$('pmReset').onclick=function(){if(!CUR||!confirm('Обнулить улов игрока '+CUR[1]+'?'))return;api({act:'reset',id:CUR[0]}).then(function(j){$('pmMsg').innerHTML=j.ok?'<span class="ok">Улов будет обнулён в течение минуты</span>':'<span class="err">'+esc(j.error)+'</span>';loadPl()})};
+
 document.addEventListener('click',function(e){var t=e.target.closest('[data-ip]');if(!t)return;$('logQ').value=t.dataset.ip;drawLog()});
 if(ss('td_adm')===H)unlock();
 setInterval(function(){if(!$('app').classList.contains('hidden'))load()},12e4);
