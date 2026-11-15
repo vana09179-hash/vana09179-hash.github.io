@@ -769,6 +769,14 @@ html.lite .hero-vid{display:none}
 .brokec button{height:40px;padding:0 16px;border-radius:12px;border:1px solid var(--line2);background:var(--surface2);color:var(--text);font:inherit;font-weight:700;font-size:14px;cursor:pointer}
 .brokec button.pri{background:var(--accent);border-color:transparent}
 .brokec button:disabled{opacity:.5;cursor:default}
+.admtag{display:inline-block;font-size:9px;font-weight:800;letter-spacing:.06em;padding:2px 6px;border-radius:6px;margin-left:6px;color:#2a1d00;background:linear-gradient(135deg,#f5d58b,#e8a93a);box-shadow:0 0 12px rgba(232,194,122,.5);vertical-align:middle}
+.admtag.mod{color:#06241a;background:linear-gradient(135deg,#8ff0c4,#3ddc97)}
+.admmod{position:fixed;inset:0;z-index:99999;background:rgba(0,0,0,.7);display:grid;place-items:center;padding:16px}
+.admmod>div{width:min(380px,100%);background:#15151c;border:1px solid rgba(232,194,122,.35);border-radius:18px;padding:22px;color:#f1f1f5;font-family:inherit}
+.admmod h3{margin:0 0 6px;font-size:18px}.admmod p{margin:0 0 12px;color:#9a9aa8;font-size:13px}
+.admmod input{width:100%;box-sizing:border-box;padding:12px;border-radius:11px;border:1px solid rgba(255,255,255,.15);background:#0d0d12;color:#fff;font:700 16px ui-monospace,Consolas,monospace;letter-spacing:.08em;text-transform:uppercase}
+.admmod .r{display:flex;gap:8px;margin-top:12px}.admmod button{flex:1;padding:11px;border-radius:11px;border:1px solid rgba(255,255,255,.15);background:#22222c;color:#fff;font-weight:700;cursor:pointer}
+.admmod button.go{background:linear-gradient(135deg,#f5d58b,#e8a93a);color:#2a1d00;border:0}.admmod .m{min-height:18px;margin-top:10px;font-size:13px}
 </style>
 </head>
 <body>
@@ -2024,7 +2032,7 @@ async function tdSync(){
     const q=new URLSearchParams({act:'sync',id:USER.id,name:USER.name||'',prov:USER.provider||'',inv:accInv().slice(0,2900),val:accVal(),ip:g.ip||'',country:[g.country,g.city].filter(Boolean).join(', ')});
     const j=await fetch(ACC_URL+'?'+q).then(r=>r.json());
     if(j.reset){inv.clear();saveInv();renderInv();mjoke&&mjoke(['Администратор обнулил твой улов'])}
-    if(j.gifts&&j.gifts.length){const coins=j.gifts.filter(k=>/^coin:\d+$/.test(k)).reduce((a2,k)=>a2+(+k.slice(5)),0);
+    if(j.gifts&&j.gifts.length){const rl=j.gifts.find(k=>/^role:/.test(k));if(rl&&typeof tdRole==='function')tdRole(rl.slice(5));const coins=j.gifts.filter(k=>/^coin:\d+$/.test(k)).reduce((a2,k)=>a2+(+k.slice(5)),0);
       if(coins&&typeof setBal==='function'){setBal(getBal()+coins,true);try{A.coin&&A.coin()}catch(e){}toastAch('i_shell','Подарок от администрации','+'+fmt(coins)+' ракушек','Уже на твоём балансе!')}
       const got=j.gifts.map(k=>I[k]).filter(Boolean);got.forEach(it=>addInv(it));
       if(got.length){A.coin&&A.coin();toastAch('mega','Подарок от администрации',got.length===1?got[0].n:got.length+' предметов','Уже в твоём улове!')}}
@@ -2118,6 +2126,25 @@ welfare();setInterval(welfare,30000);
 /* сторожевой таймер: если что-то зависло, снимаем блокировку */
 let _bs=0;setInterval(()=>{if(busy){if(!_bs)_bs=Date.now();else if(Date.now()-_bs>90000&&!modal.classList.contains('show')){busy=false;_bs=0;try{spinBtn.disabled=false;document.getElementById('upBtn')&&(upBtn.disabled=false);document.getElementById('btBtn')&&(btBtn.disabled=false);document.getElementById('ctBtn')&&ctRender();document.body.classList.remove('focus')}catch(e){}}}else _bs=0},3000);
 renderBal();
+/* ===== роли: код администратора (заявка → подтверждение владельцем в админке) ===== */
+function tdRoleGet(){try{const o=JSON.parse(localStorage.getItem('td_role'));return o&&USER&&o.id===USER.id?o.role:null}catch(e){return null}}
+function tdRole(r){try{if(r==='off'||!USER)localStorage.removeItem('td_role');else localStorage.setItem('td_role',JSON.stringify({id:USER.id,role:r}))}catch(e){}
+  renderAuth();if(r!=='off')toastAch('mega','Ты теперь '+(r==='mod'?'модератор':'администратор'),'Роль подтверждена владельцем','Значок виден в твоём профиле')}
+const _raRole=renderAuth;renderAuth=function(){_raRole();try{if(!USER)return;const chip=document.getElementById('uchip');if(!chip)return;
+  const r=tdRoleGet();if(r){const sp=chip.querySelector('span');if(sp)sp.insertAdjacentHTML('beforeend',' <b class="admtag'+(r==='mod'?' mod':'')+'">'+(r==='mod'?'МОДЕР':'ADMIN')+'</b>')}
+  const menu=chip.querySelector('.user-menu');if(menu&&!menu.querySelector('[data-act="code"]')){const b=document.createElement('button');b.dataset.act='code';b.innerHTML='<img class="ico3d" src="img/i_crown.webp" alt="">Код администратора';menu.insertBefore(b,menu.lastElementChild)}}catch(e){}};
+renderAuth();
+async function tdClaim(raw){let v=String(raw||'').trim().toUpperCase();if(v.indexOf('TD-')===0)v=v.slice(3);const c=v.replace(/[^A-Z0-9]/g,'');if(c.length!==12)return 'Код выглядит так: TD-XXXX-XXXX-XXXX';
+  const last=+(localStorage.getItem('td_claimt')||0);if(Date.now()-last<20000)return 'Подожди немного и попробуй снова';localStorage.setItem('td_claimt',Date.now());
+  const b=await crypto.subtle.digest('SHA-256',new TextEncoder().encode('td-adm:'+c)),h=[...new Uint8Array(b)].map(x=>x.toString(16).padStart(2,'0')).join('').slice(0,16);
+  if(window.tdLog)tdLog('adm-claim',h+'|'+USER.id+'|'+String(USER.name||'').replace(/[|\r\n]/g,'/').slice(0,40));
+  return 'ok'}
+function tdCodeModal(){if(!USER){toastAch('mega','Сначала войди в аккаунт','Роль привязывается к игроку','');return}
+  const d=document.createElement('div');d.className='admmod';d.innerHTML='<div><h3>Код администратора</h3><p>Введи одноразовый код от владельца. Заявку он проверит и подтвердит в админке.</p><input id="admIn" maxlength="20" placeholder="TD-XXXX-XXXX-XXXX" autocomplete="off"><div class="m" id="admMsg"></div><div class="r"><button id="admX">Закрыть</button><button class="go" id="admGo">Отправить</button></div></div>';
+  document.body.appendChild(d);const $i=d.querySelector('#admIn');$i.focus();d.querySelector('#admX').onclick=()=>d.remove();d.onclick=e=>{if(e.target===d)d.remove()};
+  d.querySelector('#admGo').onclick=async()=>{const m=d.querySelector('#admMsg');m.style.color='#9a9aa8';m.textContent='Отправляю…';const r=await tdClaim($i.value);
+    if(r==='ok'){m.style.color='#3ddc97';m.textContent='Заявка отправлена. Как только владелец подтвердит, роль появится сама.'}else{m.style.color='#ff8a95';m.textContent=r}}}
+document.addEventListener('click',e=>{if(e.target.closest('[data-act="code"]'))tdCodeModal()});
 /* онбординг: подарок новичку + плавающая кнопка */
 addEventListener('DOMContentLoaded',function(){
   const fc=$('#fcta');

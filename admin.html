@@ -363,6 +363,26 @@ h1.hd img{width:44px;vertical-align:middle;margin-left:6px}
   .gwrap .pch::before{left:4px}
   .gwrap .pch small{font-size:12px}
 }
+
+/* ===== админы: роли, приглашения, подтверждение ===== */
+.admb{display:inline-block;vertical-align:middle;font-size:9.5px;font-weight:800;letter-spacing:.06em;padding:2px 6px;border-radius:6px;margin-left:6px;color:#2a1d00;background:linear-gradient(135deg,#f5d58b,#e8a93a);box-shadow:0 0 12px rgba(232,194,122,.45)}
+.admb.mod{color:#06241a;background:linear-gradient(135deg,#8ff0c4,#3ddc97);box-shadow:0 0 12px rgba(61,220,151,.4)}
+.admg{display:grid;grid-template-columns:minmax(0,1.5fr) minmax(0,1fr);gap:16px;margin-top:6px}
+@media(max-width:1000px){.admg{grid-template-columns:1fr}}
+.admp{background:var(--panel);border:1px solid var(--line);border-radius:18px;padding:18px}
+.admp h3{margin:0 0 4px;font-size:15px}.admp .note{margin-bottom:12px}
+.admr{display:flex;align-items:center;gap:12px;padding:11px 12px;border:1px solid var(--line);border-radius:13px;background:var(--panel2);margin-bottom:8px;flex-wrap:wrap}
+.admr img{width:34px;height:34px;border-radius:50%;object-fit:cover;background:#222}
+.admr .nm{font-weight:700;display:flex;align-items:center;flex-wrap:wrap}
+.admr small{display:block;color:var(--muted);font-size:11.5px;font-weight:400}
+.admr .sp{flex:1;min-width:8px}
+.admr .chk{font-size:11px;color:var(--mint)}.admr .chk.w{color:#ffd37a}.admr .chk.e{color:var(--red)}
+.admcode{font:700 20px/1.2 ui-monospace,Consolas,monospace;letter-spacing:.08em;color:var(--gold);background:rgba(232,194,122,.07);border:1px dashed rgba(232,194,122,.45);border-radius:12px;padding:12px 14px;text-align:center;margin:10px 0;cursor:pointer;user-select:all}
+.admf{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.admf select{background:var(--panel2);border:1px solid var(--line2);border-radius:10px;padding:8px 10px;color:var(--text)}
+.admsteps{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin:2px 0 14px}
+.admsteps div{background:var(--panel2);border:1px solid var(--line);border-radius:12px;padding:10px;font-size:12px;color:var(--muted)}
+.admsteps b{display:block;color:var(--text);font-size:13px;margin-bottom:2px}
 </style>
 </head>
 <body>
@@ -387,6 +407,7 @@ h1.hd img{width:44px;vertical-align:middle;margin-left:6px}
     <div class="nav" data-v="acc"><img src="img/i_net.webp" alt="">Аккаунты<span class="tag" id="accN">0</span></div>
     <div class="nav" data-v="cc"><img src="img/i_crown.webp" alt="">Управление<span class="tag">PRO</span></div>
     <div class="nav" data-v="board"><img src="img/i_net.webp" alt="">Доска<span class="tag">NEW</span></div>
+    <div class="nav" data-v="adm"><img src="img/i_crown.webp" alt="">Админы<span class="tag" id="admTag">0</span></div>
     <div class="nav" data-v="log"><img src="img/i_fire.webp" alt="">Журнал заходов</div>
     <div class="nav" data-v="sys"><img src="img/i_up.webp" alt="">Система<span class="tag" id="sysTag">live</span></div>
     <div class="sec">Другое</div>
@@ -464,6 +485,26 @@ h1.hd img{width:44px;vertical-align:middle;margin-left:6px}
       <iframe id="boardFr" title="Доска" style="width:100%;height:calc(100vh - 90px);min-height:520px;border:1px solid rgba(255,255,255,.08);border-radius:16px;background:#121316;display:block"></iframe>
     </section>
 
+    <section class="page hidden" id="v-adm">
+      <div class="row rv"><div class="ttl"><small>Роли · приглашения · проверка</small><b>Администраторы</b></div><div class="chips"><button class="btn" id="admRef">Проверить заново</button></div></div>
+      <div class="admsteps rv" style="--d:1">
+        <div><b>1 · Код</b>Создай одноразовый код с ролью и сроком</div>
+        <div><b>2 · Ввод на сайте</b>Друг входит в аккаунт и вводит код в меню профиля</div>
+        <div><b>3 · Проверка</b>Заявка приходит сюда — ты сверяешь имя и IP и подтверждаешь</div>
+      </div>
+      <div class="admg">
+        <div class="admp rv" style="--d:2"><h3>Действующие админы</h3><div class="note">Подпись каждой записи проверяется ключом владельца — подделать нельзя</div><div id="admList"></div></div>
+        <div>
+          <div class="admp rv" style="--d:3"><h3>Новое приглашение</h3><div class="note">Код одноразовый и сгорает по таймеру</div>
+            <div class="admf"><select id="admRole"><option value="admin">Администратор</option><option value="mod">Модератор</option></select>
+            <select id="admTtl"><option value="3600000">1 час</option><option value="86400000" selected>24 часа</option><option value="604800000">7 дней</option></select>
+            <button class="btn" id="admNew">Создать код</button></div><div id="admCode"></div></div>
+          <div class="admp rv" style="--d:4;margin-top:16px"><h3>Заявки на проверку <span id="admReqN"></span></h3><div class="note">Игрок ввёл верный код — подтверди, что это тот человек</div><div id="admReq"></div></div>
+          <div class="admp rv" style="--d:5;margin-top:16px"><h3>Приглашения</h3><div id="admInv"></div></div>
+        </div>
+      </div>
+    </section>
+
     <section class="page hidden" id="v-sys">
       <div class="row rv"><div class="ttl"><small>◷ Проверяется каждые 30 секунд</small><b>Система</b></div><div class="chips"><button class="btn" id="sysRef">Проверить сейчас</button></div></div>
       <div class="svcs" id="svcs"></div>
@@ -501,11 +542,11 @@ $('lf').onsubmit=async function(e){e.preventDefault();var h=await sha('td-salt:'
   if(h===H){ss('td_adm',H);ss('td_admk',$('pw').value);unlock()}else{$('perr').textContent='Неверный пароль';var l=$('lock');l.classList.remove('shake');void l.offsetWidth;l.classList.add('shake');$('pw').select()}};
 $('out').onclick=function(){ss('td_adm',null);ss('td_admk',null);location.reload()};
 
-var VIEW='dash',NAMES={dash:'Дашборд',acc:'Аккаунты',cc:'Центр управления',board:'Доска',log:'Журнал заходов',sys:'Система',set:'Настройки'};
+var VIEW='dash',NAMES={dash:'Дашборд',acc:'Аккаунты',cc:'Центр управления',board:'Доска',adm:'Администраторы',log:'Журнал заходов',sys:'Система',set:'Настройки'};
 function go(v){VIEW=v;document.querySelectorAll('.nav[data-v]').forEach(function(n){n.classList.toggle('on',n.dataset.v===v)});
-  ['dash','acc','cc','board','log','sys','set'].forEach(function(x){$('v-'+x).classList.toggle('hidden',x!==v)});$('crumb').textContent=NAMES[v];
+  ['dash','acc','cc','board','adm','log','sys','set'].forEach(function(x){$('v-'+x).classList.toggle('hidden',x!==v)});$('crumb').textContent=NAMES[v];
   $('v-'+v).querySelectorAll('.rv').forEach(function(el){el.style.animation='none';void el.offsetWidth;el.style.animation=''});
-  if(v==='acc')drawGraph();if(v==='cc')drawCC();if(v==='sys')drawSys();if(v==='board'&&!$('boardFr').src)$('boardFr').src='board/index.html';scrollTo({top:0,behavior:'smooth'})}
+  if(v==='acc')drawGraph();if(v==='cc')drawCC();if(v==='sys')drawSys();if(v==='adm')admCalc();if(v==='board'&&!$('boardFr').src)$('boardFr').src='board/index.html';scrollTo({top:0,behavior:'smooth'})}
 document.querySelectorAll('.nav[data-v]').forEach(function(n){n.onclick=function(){go(n.dataset.v)}});
 $('gsearch').oninput=function(){if(VIEW!=='acc')go('acc');else drawGraph()};
 
@@ -553,7 +594,7 @@ function drawTicker(){var t=ST.tot,mv=ST.mv;if(!t.length)return;var it=[['mega',
   var h=it.map(function(x){return '<span><img src="img/'+x[0]+'.webp" alt=""><em>'+x[1]+'</em>'+x[2]+'</span>'}).join('');$('ticker').innerHTML=h+h}
 
 var ROWS=[];
-function loadLog(){if(!ss('td_admk'))return;api({}).then(function(j){if(j.error){$('logB').innerHTML='<tr><td colspan="6" class="err">Нет доступа</td></tr>';return}ROWS=j.rows||[];$('logSheet').href=j.url;drawLog();if(VIEW==='cc')drawCC()}).catch(function(){})}
+function loadLog(){if(!ss('td_admk'))return;api({}).then(function(j){if(j.error){$('logB').innerHTML='<tr><td colspan="6" class="err">Нет доступа</td></tr>';return}ROWS=j.rows||[];$('logSheet').href=j.url;drawLog();admCalc();if(VIEW==='cc')drawCC()}).catch(function(){})}
 function drawLog(){$('logB').innerHTML=ROWS.length?ROWS.map(function(r){return '<tr><td>'+new Date(r[0]).toLocaleString('ru-RU',{day:'2-digit',month:'2-digit',hour:'2-digit',minute:'2-digit'})+'</td><td class="ip">'+esc(r[1])+'</td><td>'+esc([r[2],r[3]].filter(Boolean).join(', '))+'</td><td>'+esc(r[4])+'</td><td><span class="ev">'+esc(r[5])+'</span></td><td>'+esc(r[6])+'</td></tr>'}).join(''):'<tr><td colspan="6" class="note">Пока пусто</td></tr>'}
 
 var PL=[],ITEMS=[],FIL='all',SEL=null;
@@ -585,7 +626,7 @@ function drawGraph(){
   var html=svg+'<div class="orb"><div class="ring"></div><div class="ring2"></div><b>Тюлень Дроп</b><img src="img/mega.webp" alt=""><small>игроков: '+PL.length+'</small></div>';
   cs.forEach(function(c,i){html+='<div class="cat'+(i===ci?' on':'')+'" data-cat="'+c.f+'" style="left:'+(400/W*100)+'%;top:'+(by[i]/Hh*100)+'%"><b><img src="img/'+c.img+'.webp" alt="">'+c.c+'</b><span>'+c.n+'</span></div>'});
   show.forEach(function(p,i){var q=pos[i],cl=(p[9]==='да'?' ban':isOnl(p)?' onl':'')+(SEL===String(p[0])?' on':'');
-    html+='<div class="pch'+cl+'" data-pid="'+esc(p[0])+'" style="left:'+(q[0]/W*100)+'%;top:'+(q[1]/Hh*100)+'%;animation-delay:'+(300+i*45)+'ms">'+esc(String(p[1]).slice(0,18))+'<small>улов '+invOf(p).reduce(function(a,x){return a+x.n},0)+' · '+fmt(+p[8]||0)+' ракушек</small></div>'});
+    html+='<div class="pch'+cl+'" data-pid="'+esc(p[0])+'" style="left:'+(q[0]/W*100)+'%;top:'+(q[1]/Hh*100)+'%;animation-delay:'+(300+i*45)+'ms">'+esc(String(p[1]).slice(0,18))+AT(p)+'<small>улов '+invOf(p).reduce(function(a,x){return a+x.n},0)+' · '+fmt(+p[8]||0)+' ракушек</small></div>'});
   if(more>0)html+='<div class="pch nodot" style="left:62%;top:97%;animation-delay:900ms">… и ещё '+more+' — уточни поиск</div>';
   if(!list.length)html+='<div class="pch nodot" style="left:60%;top:50%">Никого не найдено</div>';
   $('gwrap').innerHTML=html;
@@ -599,7 +640,7 @@ function drawPane(){var p=cur(),el=$('pane');if(!p){el.innerHTML='<div class="no
   var iv=invOf(p),cnt=iv.reduce(function(a,x){return a+x.n},0),ban=p[9]==='да',val=+p[8]||0,mx=Math.max.apply(null,PL.map(function(x){return +x[8]||0}).concat([1])),pct=Math.round(val/mx*100),eq='';
   for(var i=0;i<34;i++)eq+='<i style="height:'+(20+Math.abs(Math.sin(i*1.7+val))*80)+'%;animation-delay:'+(i*40)+'ms"></i>';
   el.innerHTML='<div class="tp"><img src="img/'+(p[2]==='google'?'i_star':'c_fish')+'.webp" alt="">'+(p[2]==='google'?'Вход через Google':'Гость / быстрый вход')+'</div>'+
-    '<h2>'+esc(p[1])+'</h2><div class="note">ID '+esc(String(p[0]).slice(0,24))+'</div>'+
+    '<h2>'+esc(p[1])+AT(p)+'</h2><div class="note">ID '+esc(String(p[0]).slice(0,24))+'</div>'+
     '<div class="stat"><span class="badge'+(ban?' b':'')+'">'+(ban?'Бан':(isOnl(p)?'Онлайн':'Активен'))+'</span><span class="note">Последний заход: '+ago(p[4])+'<br>Создан '+new Date(p[3]).toLocaleDateString('ru-RU')+(ban?' · причина: '+esc(p[10]):'')+'</span></div>'+
     '<div class="sent"><div><div class="note" style="color:#e9c9cc">Ценность улова</div><b>'+fmt(val)+'</b> <span class="note">· '+pct+'% от топа</span></div><div class="eq">'+eq+'</div></div>'+
     '<div class="tiles"><div><b>'+cnt+'</b><span>предметов</span></div><div><b>'+iv.length+'</b><span>разных</span></div><div><b class="ip" style="font-size:15px">'+esc(p[5]||'—')+'</b><span>IP</span></div><div><b style="font-size:15px">'+esc(p[6]||'—')+'</b><span>откуда</span></div></div>'+
@@ -613,6 +654,58 @@ function drawPane(){var p=cur(),el=$('pane');if(!p){el.innerHTML='<div class="no
 }
 function drawPick(){var q=($('pmFind').value||'').toLowerCase();$('pmPick').innerHTML=ITEMS.filter(function(it){return !q||it.n.toLowerCase().indexOf(q)>=0}).slice(0,24).map(function(it){return '<div data-give="'+it.k+'" title="Выдать"><img src="img/'+it.k+'.webp" alt="">'+esc(it.n)+'</div>'}).join('')}
 
+
+
+/* ===================== АДМИНЫ ===================== */
+var ADM={ids:{},list:[],inv:[],req:[]};
+function admKey(){return ss('td_admk')||''}
+async function asig(t){return (await sha('td-sig:'+admKey()+'|'+t)).slice(0,16)}
+function AT(p){var a=ADM.ids[String(p[0])];return a?' <span class="admb'+(a.role==='mod'?' mod':'')+'" title="Подтверждённый администратор">'+(a.role==='mod'?'МОДЕР':'ADMIN')+'</span>':''}
+function admClean(t){return String(t||'').replace(/[|\r\n]/g,'/').slice(0,40)}
+function admPost(ev,detail){return fetch(LOG,{method:'POST',mode:'no-cors',headers:{'Content-Type':'text/plain'},body:JSON.stringify({ev:ev,detail:detail,player:'ADMIN-PANEL',ua:'admin'})})}
+function admLocal(){try{return JSON.parse(localStorage.getItem('td_invcodes')||'{}')}catch(e){return{}}}
+async function admCalc(){
+  if(!admKey())return;
+  var ev=(ROWS||[]).map(function(r){return{t:new Date(r[0]).getTime()||0,ip:r[1],geo:[r[2],r[3]].filter(Boolean).join(', '),ev:String(r[5]||''),d:String(r[6]||'')}}).filter(function(e){return e.ev.indexOf('adm-')===0}).sort(function(a,b){return a.t-b.t});
+  var inv={},gr={},rej={},claims=[],e,f;
+  for(var i=0;i<ev.length;i++){e=ev[i];f=e.d.split('|');
+    if(e.ev==='adm-inv'){if(f[3]===await asig('inv|'+f[0]+'|'+f[1]+'|'+f[2]))inv[f[0]]={h:f[0],role:f[1],exp:+f[2],t:e.t}}
+    else if(e.ev==='adm-claim'){claims.push({h:f[0],pid:f[1],name:f.slice(2).join('|'),t:e.t,ip:e.ip,geo:e.geo})}
+    else if(e.ev==='adm-grant'){if(f[4]===await asig('grant|'+f[0]+'|'+f[1]+'|'+f[2]+'|'+f[3]))gr[f[0]]={pid:f[0],role:f[1],name:f[2],h:f[3],t:e.t,on:true}}
+    else if(e.ev==='adm-rev'){if(f[1]===await asig('rev|'+f[0])&&gr[f[0]])gr[f[0]].on=false}
+    else if(e.ev==='adm-rej'){if(f[2]===await asig('rej|'+f[0]+'|'+f[1]))rej[f[0]+'|'+f[1]]=1}}
+  var used={};Object.keys(gr).forEach(function(k){used[gr[k].h]=1});
+  ADM.ids={};ADM.list=[];Object.keys(gr).forEach(function(k){if(gr[k].on){ADM.ids[k]=gr[k];ADM.list.push(gr[k])}});
+  ADM.inv=Object.keys(inv).map(function(h){var v=inv[h];v.st=used[h]?'used':(v.exp<Date.now()?'exp':'on');return v}).sort(function(a,b){return b.t-a.t});
+  var seen={};ADM.req=claims.filter(function(c){var v=inv[c.h];if(!v||c.t>v.exp||used[c.h]||rej[c.h+'|'+c.pid]||ADM.ids[c.pid])return false;var k=c.h+c.pid;if(seen[k])return false;seen[k]=1;c.role=v.role;return true});
+  var n=ADM.req.length;$('admReqN').innerHTML=n?'<span class="badge" style="border-color:rgba(255,92,108,.5);color:#ffb3ba;background:rgba(255,92,108,.08)">'+n+' новых</span>':'';
+  $('admTag').textContent=ADM.list.length;drawAdm();if(VIEW==='acc')drawGraph();if(VIEW==='cc')drawCC()}
+function admPl(pid){return PL.filter(function(p){return String(p[0])===String(pid)})[0]}
+function drawAdm(){
+  $('admList').innerHTML=ADM.list.length?ADM.list.map(function(a){var p=admPl(a.pid),chk='<span class="chk">✓ подпись верна</span>';
+    if(!p)chk='<span class="chk w">⚠ нет в базе игроков</span>';else if(p[9]==='да')chk='<span class="chk e">⛔ аккаунт забанен</span>';else chk+=' <span class="chk">· '+(isOnl(p)?'онлайн':'был '+ago(p[4]))+'</span>';
+    return '<div class="admr"><img src="img/'+(p&&p[2]==='google'?'i_star':'mega')+'.webp" alt=""><div class="nm">'+esc(p?p[1]:a.name)+' <span class="admb'+(a.role==='mod'?' mod':'')+'">'+(a.role==='mod'?'МОДЕР':'ADMIN')+'</span><small style="flex-basis:100%">ID '+esc(String(a.pid).slice(0,18))+' · с '+new Date(a.t).toLocaleDateString('ru-RU')+'</small></div><div class="sp"></div><div>'+chk+'</div><button class="btn red" data-admrev="'+esc(a.pid)+'">Снять</button></div>'}).join(''):'<div class="note">Пока только ты. Создай код справа и отправь другу.</div>';
+  $('admReq').innerHTML=ADM.req.length?ADM.req.map(function(c){var p=admPl(c.pid);
+    return '<div class="admr"><div class="nm">'+esc(c.name)+'<small style="flex-basis:100%">'+(c.role==='mod'?'Модератор':'Администратор')+' · '+esc(c.ip||'IP не определён')+' · '+esc(c.geo||'—')+' · '+ago(new Date(c.t))+(p?'':' · ⚠ нет в базе')+'</small></div><div class="sp"></div><button class="btn" data-admok="'+esc(c.h+'|'+c.pid+'|'+c.role+'|'+c.name)+'">Подтвердить</button><button class="btn red" data-admno="'+esc(c.h+'|'+c.pid)+'">Отклонить</button></div>'}).join(''):'<div class="note">Заявок нет</div>';
+  var codes=admLocal();
+  $('admInv').innerHTML=ADM.inv.length?ADM.inv.slice(0,8).map(function(v){var code=codes[v.h];
+    return '<div class="admr"><div class="nm">'+(v.role==='mod'?'Модератор':'Администратор')+'<small style="flex-basis:100%">'+(v.st==='on'&&code?'<span style="font-family:ui-monospace,Consolas,monospace;color:var(--gold)">'+esc(code)+'</span> · ':'')+'до '+new Date(v.exp).toLocaleString('ru-RU',{day:'2-digit',month:'2-digit',hour:'2-digit',minute:'2-digit'})+'</small></div><div class="sp"></div><span class="chk '+(v.st==='on'?'':'w')+'">'+(v.st==='on'?'активен':v.st==='used'?'использован':'истёк')+'</span></div>'}).join(''):'<div class="note">Приглашений ещё не было</div>'}
+$('admRef').onclick=function(){loadAll();setTimeout(admCalc,1500)};
+$('admNew').onclick=async function(){
+  var b=new Uint8Array(12);crypto.getRandomValues(b);var al='ABCDEFGHJKLMNPQRSTUVWXYZ23456789',c='';for(var i=0;i<12;i++)c+=al[b[i]%al.length];
+  var h=(await sha('td-adm:'+c)).slice(0,16),role=$('admRole').value,exp=Date.now()+(+$('admTtl').value),pretty='TD-'+c.slice(0,4)+'-'+c.slice(4,8)+'-'+c.slice(8);
+  await admPost('adm-inv',h+'|'+role+'|'+exp+'|'+await asig('inv|'+h+'|'+role+'|'+exp));
+  var m=admLocal();m[h]=pretty;try{localStorage.setItem('td_invcodes',JSON.stringify(m))}catch(e){}
+  $('admCode').innerHTML='<div class="admcode" id="admCodeV">'+pretty+'</div><div class="note">Нажми на код, чтобы скопировать. Другу: зайти на сайт → меню профиля → «Код администратора».</div>';
+  $('admCodeV').onclick=function(){try{navigator.clipboard.writeText(pretty);this.style.borderColor='var(--mint)'}catch(e){}};
+  setTimeout(loadLog,1800);setTimeout(admCalc,3200)};
+document.addEventListener('click',async function(e){
+  var ok=e.target.closest('[data-admok]'),no=e.target.closest('[data-admno]'),rv=e.target.closest('[data-admrev]');
+  if(ok){var f=ok.dataset.admok.split('|'),name=admClean(f.slice(3).join('|'));ok.disabled=true;ok.textContent='…';
+    await admPost('adm-grant',f[1]+'|'+f[2]+'|'+name+'|'+f[0]+'|'+await asig('grant|'+f[1]+'|'+f[2]+'|'+name+'|'+f[0]));
+    api({act:'give',id:f[1],items:'role:'+f[2]});setTimeout(loadLog,1800);setTimeout(admCalc,3200)}
+  if(no){var g=no.dataset.admno.split('|');no.disabled=true;await admPost('adm-rej',g[0]+'|'+g[1]+'|'+await asig('rej|'+g[0]+'|'+g[1]));setTimeout(loadLog,1800);setTimeout(admCalc,3200)}
+  if(rv){if(!confirm('Снять права администратора?'))return;var id=rv.dataset.admrev;rv.disabled=true;await admPost('adm-rev',id+'|'+await asig('rev|'+id));api({act:'give',id:id,items:'role:off'});setTimeout(loadLog,1800);setTimeout(admCalc,3200)}});
 
 /* ===================== ЦЕНТР УПРАВЛЕНИЯ ===================== */
 var CCF='all',CCSEL=null,CCT='new',CCTAB='coin',CCQ='';
@@ -634,7 +727,7 @@ function drawCC(){
   document.querySelectorAll('#ccTabs b').forEach(function(x){x.classList.toggle('on',x.dataset.t===CCT)});
   var list=ccFilter();if(!CCSEL||!list.some(function(p){return String(p[0])===CCSEL}))CCSEL=list[0]?String(list[0][0]):null;
   $('ccList').innerHTML=list.length?list.slice(0,60).map(function(p,i){var cnt=invOf(p).reduce(function(a,x){return a+x.n},0),ban=p[9]==='да';
-    return '<div class="ccc'+(String(p[0])===CCSEL?' on':'')+'" data-cc="'+esc(p[0])+'" style="animation-delay:'+(i*40)+'ms"><div class="h"><img src="img/'+(p[2]==='google'?'i_star':'c_fish')+'.webp" alt=""><b>'+esc(p[1])+'</b><small>'+ago(p[4])+'</small></div><div class="pv">'+(ban?'<span class="tg b">БАН</span>':pVip(p)?'<span class="tg">VIP</span>':'')+'улов '+cnt+' · '+fmt(+p[8]||0)+' ракушек</div><div class="dr"><span>IP</span>'+esc(p[5]||'—')+' · '+esc(p[6]||'')+'</div></div>'}).join(''):'<div class="note" style="padding:20px;text-align:center">Нет игроков в этом разделе</div>';
+    return '<div class="ccc'+(String(p[0])===CCSEL?' on':'')+'" data-cc="'+esc(p[0])+'" style="animation-delay:'+(i*40)+'ms"><div class="h"><img src="img/'+(p[2]==='google'?'i_star':'c_fish')+'.webp" alt=""><b>'+esc(p[1])+AT(p)+'</b><small>'+ago(p[4])+'</small></div><div class="pv">'+(ban?'<span class="tg b">БАН</span>':pVip(p)?'<span class="tg">VIP</span>':'')+'улов '+cnt+' · '+fmt(+p[8]||0)+' ракушек</div><div class="dr"><span>IP</span>'+esc(p[5]||'—')+' · '+esc(p[6]||'')+'</div></div>'}).join(''):'<div class="note" style="padding:20px;text-align:center">Нет игроков в этом разделе</div>';
   drawCCD();drawCCA();
 }
 $('ccQ').oninput=drawCC;$('ccRef').onclick=function(){loadAll()};
