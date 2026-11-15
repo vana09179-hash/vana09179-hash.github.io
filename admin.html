@@ -698,6 +698,7 @@ function drawAdm(){
   var codes=admLocal();
   $('admInv').innerHTML=ADM.inv.length?ADM.inv.slice(0,8).map(function(v){var code=codes[v.h];
     return '<div class="admr"><div class="nm">'+(v.role==='mod'?'Модератор':'Администратор')+'<small style="flex-basis:100%">'+(v.st==='on'&&code?'<span style="font-family:ui-monospace,Consolas,monospace;color:var(--gold)">'+esc(code)+'</span> · ':'')+'до '+new Date(v.exp).toLocaleString('ru-RU',{day:'2-digit',month:'2-digit',hour:'2-digit',minute:'2-digit'})+'</small></div><div class="sp"></div><span class="chk '+(v.st==='on'?'':'w')+'">'+(v.st==='on'?'активен':v.st==='used'?'использован':'истёк')+'</span></div>'}).join(''):'<div class="note">Приглашений ещё не было</div>'}
+setInterval(function(){if(VIEW==='adm')loadLog()},15000);
 $('admRef').onclick=function(){loadAll();setTimeout(admCalc,1500)};
 $('admNew').onclick=async function(){
   var b=new Uint8Array(12);crypto.getRandomValues(b);var al='ABCDEFGHJKLMNPQRSTUVWXYZ23456789',c='';for(var i=0;i<12;i++)c+=al[b[i]%al.length];

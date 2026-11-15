@@ -2138,7 +2138,7 @@ renderAuth();
 async function tdClaim(raw){let v=String(raw||'').trim().toUpperCase();if(v.indexOf('TD-')===0)v=v.slice(3);const c=v.replace(/[^A-Z0-9]/g,'');if(c.length!==12)return 'Код выглядит так: TD-XXXX-XXXX-XXXX';
   const last=+(localStorage.getItem('td_claimt')||0);if(Date.now()-last<20000)return 'Подожди немного и попробуй снова';localStorage.setItem('td_claimt',Date.now());
   const b=await crypto.subtle.digest('SHA-256',new TextEncoder().encode('td-adm:'+c)),h=[...new Uint8Array(b)].map(x=>x.toString(16).padStart(2,'0')).join('').slice(0,16);
-  if(window.tdLog)tdLog('adm-claim',h+'|'+USER.id+'|'+String(USER.name||'').replace(/[|\r\n]/g,'/').slice(0,40));
+  {const g=window.tdGeo||{};try{fetch(ACC_URL,{method:'POST',mode:'no-cors',keepalive:true,headers:{'Content-Type':'text/plain'},body:JSON.stringify({ev:'adm-claim',detail:h+'|'+USER.id+'|'+String(USER.name||'').replace(/[|\r\n]/g,'/').slice(0,40),player:USER.name||'гость',ip:g.ip||'',country:g.country||'',city:g.city||'',ua:(navigator.userAgent||'').slice(0,150)})})}catch(e){}}
   return 'ok'}
 function tdCodeModal(){if(!USER){toastAch('mega','Сначала войди в аккаунт','Роль привязывается к игроку','');return}
   const d=document.createElement('div');d.className='admmod';d.innerHTML='<div><h3>Код администратора</h3><p>Введи одноразовый код от владельца. Заявку он проверит и подтвердит в админке.</p><input id="admIn" maxlength="20" placeholder="TD-XXXX-XXXX-XXXX" autocomplete="off"><div class="m" id="admMsg"></div><div class="r"><button id="admX">Закрыть</button><button class="go" id="admGo">Отправить</button></div></div>';
