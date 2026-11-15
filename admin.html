@@ -383,6 +383,14 @@ h1.hd img{width:44px;vertical-align:middle;margin-left:6px}
 .admsteps{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin:2px 0 14px}
 .admsteps div{background:var(--panel2);border:1px solid var(--line);border-radius:12px;padding:10px;font-size:12px;color:var(--muted)}
 .admsteps b{display:block;color:var(--text);font-size:13px;margin-bottom:2px}
+
+/* ===== оживлённые кнопки ===== */
+.pmenu{position:fixed;z-index:9999;min-width:210px;background:#16161e;border:1px solid var(--line2);border-radius:14px;padding:6px;box-shadow:0 20px 50px rgba(0,0,0,.55);animation:rv .25s both}
+.pmenu button{display:block;width:100%;text-align:left;background:none;border:0;border-radius:9px;padding:9px 12px;font-size:13px;font-weight:600;cursor:pointer;color:var(--text)}
+.pmenu button:hover{background:rgba(255,255,255,.07)}
+.pmenu .pt{padding:6px 12px 4px;font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.06em}
+.tst{position:fixed;left:50%;bottom:26px;transform:translateX(-50%);z-index:10000;background:#1d1d27;border:1px solid var(--line2);border-radius:12px;padding:10px 16px;font-weight:600;font-size:13px;box-shadow:0 14px 40px rgba(0,0,0,.5);animation:rv .3s both}
+.sc,.live,.hello{cursor:pointer}.sc .dots{cursor:pointer;border-radius:8px;padding:0 6px}.sc .dots:hover{background:rgba(255,255,255,.08)}
 </style>
 </head>
 <body>
@@ -451,7 +459,7 @@ h1.hd img{width:44px;vertical-align:middle;margin-left:6px}
     </section>
 
     <section class="page hidden" id="v-log">
-      <div class="row"><div class="ttl"><small>◷ Последние 300 записей</small><b>Журнал заходов</b></div><div class="chips"><a class="btn" id="logSheet" target="_blank" rel="noopener">Открыть таблицу</a></div></div>
+      <div class="row"><div class="ttl"><small>◷ Последние 300 записей</small><b>Журнал заходов</b></div><div class="chips"><button class="btn" id="logFlt" hidden></button><a class="btn" id="logSheet" target="_blank" rel="noopener">Открыть таблицу</a></div></div>
       <div class="tbl rv"><table><thead><tr><th>Время</th><th>IP</th><th>Откуда</th><th>Игрок</th><th>Действие</th><th>Детали</th></tr></thead><tbody id="logB"><tr><td colspan="6" class="note">загружаю…</td></tr></tbody></table></div>
     </section>
 
@@ -593,9 +601,9 @@ function drawFunnel(){var u=ST.tot[1]||0,mv=ST.mv;$('funnel').innerHTML='<div><b
 function drawTicker(){var t=ST.tot,mv=ST.mv;if(!t.length)return;var it=[['mega','Сегодня',fmt(ST.dv[13])],['i_fire','Онлайн',fmt(ON)],['s_cosmo','Всего людей',fmt(t[1])],['c_fish','Кейсы',fmt(mv[0])],['i_up','Апгрейды',fmt(mv[1])],['i_crown','Контракты',fmt(mv[2])],['i_fire','Битвы',fmt(mv[3])],['i_star','Колесо',fmt(mv[4])],['i_net','Аккаунты',fmt(PL.length)],['c_gift','Заходов',fmt(t[0])]];
   var h=it.map(function(x){return '<span><img src="img/'+x[0]+'.webp" alt=""><em>'+x[1]+'</em>'+x[2]+'</span>'}).join('');$('ticker').innerHTML=h+h}
 
-var ROWS=[];
+var ROWS=[],LOGQ='';
 function loadLog(){if(!ss('td_admk'))return;api({}).then(function(j){if(j.error){$('logB').innerHTML='<tr><td colspan="6" class="err">Нет доступа</td></tr>';return}ROWS=j.rows||[];$('logSheet').href=j.url;drawLog();admCalc();if(VIEW==='cc')drawCC()}).catch(function(){})}
-function drawLog(){$('logB').innerHTML=ROWS.length?ROWS.map(function(r){return '<tr><td>'+new Date(r[0]).toLocaleString('ru-RU',{day:'2-digit',month:'2-digit',hour:'2-digit',minute:'2-digit'})+'</td><td class="ip">'+esc(r[1])+'</td><td>'+esc([r[2],r[3]].filter(Boolean).join(', '))+'</td><td>'+esc(r[4])+'</td><td><span class="ev">'+esc(r[5])+'</span></td><td>'+esc(r[6])+'</td></tr>'}).join(''):'<tr><td colspan="6" class="note">Пока пусто</td></tr>'}
+function drawLog(){var LR=LOGQ?ROWS.filter(function(r){return String(r[4])===LOGQ}):ROWS;var fb=$('logFlt');fb.hidden=!LOGQ;fb.textContent='Игрок: '+LOGQ+' ✕';$('logB').innerHTML=LR.length?LR.map(function(r){return '<tr><td>'+new Date(r[0]).toLocaleString('ru-RU',{day:'2-digit',month:'2-digit',hour:'2-digit',minute:'2-digit'})+'</td><td class="ip">'+esc(r[1])+'</td><td>'+esc([r[2],r[3]].filter(Boolean).join(', '))+'</td><td>'+esc(r[4])+'</td><td><span class="ev">'+esc(r[5])+'</span></td><td>'+esc(r[6])+'</td></tr>'}).join(''):'<tr><td colspan="6" class="note">Пока пусто</td></tr>'}
 
 var PL=[],ITEMS=[],FIL='all',SEL=null;
 fetch('./index.html').then(function(r){return r.text()}).then(function(t){var re=/\b([a-z_]+):\{n:'([^']+)'(?:,sn:'[^']*')?,r:'([a-z]+)'[^}]*?v:(\d+)/g,m;while((m=re.exec(t)))ITEMS.push({k:m[1],n:m[2],r:m[3],v:+m[4]});ITEMS.sort(function(a,b){return b.v-a.v})}).catch(function(){});
@@ -834,6 +842,42 @@ function meUI(){var off=ls('td_notrack')==='1';$('me').textContent=off?'Снов
 $('me').onclick=function(){if(ls('td_notrack')==='1'){try{localStorage.removeItem('td_notrack')}catch(e){}}else ls('td_notrack','1');meUI()};
 
 if(ss('td_adm')===H)unlock();
+
+/* ===================== ОЖИВЛЁННЫЕ КНОПКИ ===================== */
+var POP=null;
+function closePop(){if(POP){POP.remove();POP=null}}
+function tst(t){var d=document.createElement('div');d.className='tst';d.textContent=t;document.body.appendChild(d);setTimeout(function(){d.remove()},2200)}
+function popMenu(anchor,items){closePop();var d=document.createElement('div');d.className='pmenu';
+  d.innerHTML=items.map(function(it,i){return it.h?'<div class="pt">'+esc(it.h)+'</div>':'<button data-pi="'+i+'">'+esc(it.t)+'</button>'}).join('');document.body.appendChild(d);
+  var r=anchor.getBoundingClientRect();d.style.top=Math.max(8,Math.min(innerHeight-d.offsetHeight-10,r.bottom+6))+'px';d.style.left=Math.max(10,Math.min(innerWidth-d.offsetWidth-10,r.right-d.offsetWidth))+'px';d._items=items;POP=d}
+function copyTxt(t,msg){try{navigator.clipboard.writeText(String(t));tst(msg||'Скопировано')}catch(e){tst('Не удалось скопировать')}}
+function saveJson(name,obj){var a=document.createElement('a');a.href=URL.createObjectURL(new Blob([JSON.stringify(obj,null,2)],{type:'application/json'}));a.download=name;a.click();setTimeout(function(){URL.revokeObjectURL(a.href)},2000)}
+function goLogFor(name){LOGQ=name||'';go('log');drawLog()}
+$('logFlt').onclick=function(){LOGQ='';drawLog()};
+document.addEventListener('click',function(e){
+  var inP=e.target.closest('.pmenu');
+  if(inP&&POP){var b=e.target.closest('button[data-pi]');if(b){var it=POP._items[+b.dataset.pi];closePop();it.f()}return}
+  closePop();
+  var dots=e.target.closest('.sc .dots');
+  if(dots){var card=dots.closest('.sc');popMenu(dots,[{t:'Обновить данные',f:function(){loadAll();tst('Обновляю…')}},{t:'Копировать значение',f:function(){copyTxt(card.querySelector('.v').textContent)}},{t:'Открыть журнал заходов',f:function(){goLogFor('')}},{t:'Открыть аккаунты',f:function(){go('acc')}}]);return}
+  var sc=e.target.closest('.sc');
+  if(sc){var k=(sc.querySelector('small')||{}).textContent||'';
+    if(k.indexOf('ОНЛАЙН')===0){FIL='onl';go('acc')}else if(k.indexOf('ВСЕГО')===0)go('acc');else if(k.indexOf('КЕЙСЫ')===0)$('modes').scrollIntoView({behavior:'smooth',block:'center'});else goLogFor('');return}
+  if(e.target.closest('.live')){FIL='onl';go('acc');return}
+  if(e.target.closest('.hello')){go('set');return}
+  var bell=e.target.closest('.ccbell');
+  if(bell){var bn=PL.filter(function(p){return p[9]==='да'}).length,gf=PL.filter(function(p){return p[11]}).length,rq=ADM.req.length,its=[{h:'События'}];
+    if(bn)its.push({t:'Забанены: '+bn,f:function(){CCF='ban';CCT='all';drawCC()}});
+    if(gf)its.push({t:'Ждут подарка: '+gf,f:function(){CCT='all';CCF='all';drawCC()}});
+    if(rq)its.push({t:'Заявки в админы: '+rq,f:function(){go('adm')}});
+    if(its.length===1)its.push({t:'Новых событий нет',f:function(){}});popMenu(bell,its);return}
+  var tb=e.target.closest('.ccd .tb button');
+  if(tb){var p=ccCur();if(!p)return;var t=tb.title;
+    if(t==='Сохранить'){saveJson('player-'+String(p[0]).slice(0,12)+'.json',{id:p[0],name:p[1],provider:p[2],created:p[3],lastSeen:p[4],country:p[6],value:p[8],banned:p[9]==='да',reason:p[10],inventory:invOf(p),notes:notesOf(p[0])});tst('Карточка игрока сохранена')}
+    else if(t==='Журнал')goLogFor(p[1]);
+    else if(t==='Ещё')popMenu(tb,[{t:'Копировать имя',f:function(){copyTxt(p[1])}},{t:'Копировать IP',f:function(){copyTxt(p[5]||'',p[5]?'IP скопирован':'IP неизвестен')}},{t:'Показать на карте',f:function(){SEL=String(p[0]);FIL='all';go('acc')}},{t:'Выдать ракушки',f:function(){CCTAB='coin';drawCCA()}},{t:p[9]==='да'?'Разбанить':'Забанить',f:function(){CCTAB='ban';drawCCA()}},{t:'Добавить заметку',f:function(){CCTAB='note';drawCCA()}}]);
+    return}
+  var cp=e.target.closest('[data-copy]');if(cp)setTimeout(function(){if(cp.isConnected)cp.textContent='📋'},1200)});
 })();
 </script>
 </body>

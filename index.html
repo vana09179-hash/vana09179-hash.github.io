@@ -414,7 +414,7 @@ footer{color:var(--dim);font-size:12.5px;margin-top:36px}
   .h-right{order:-1;min-height:220px}.h-mascot{width:190px;height:190px}.h-glow{width:220px;height:220px}.h-orbit img{width:56px;height:56px}
   .h-left{padding:0 22px 26px;max-width:none}
   .bnav{display:flex;position:fixed;left:10px;right:10px;bottom:10px;z-index:60;justify-content:space-around;padding:6px;border-radius:14px;background:rgba(24,24,28,.94);backdrop-filter:blur(10px);border:1px solid var(--line)}
-  .bnav button{display:flex;flex-direction:column;align-items:center;gap:2px;font-size:11px;font-weight:600;color:var(--muted);padding:5px 16px;border-radius:10px}
+  .bnav button{display:flex;flex-direction:column;align-items:center;gap:2px;font-size:11px;font-weight:600;color:var(--muted);padding:5px clamp(3px,1.6vw,16px);border-radius:10px}
   .bnav button img{width:26px;height:26px;object-fit:contain}
   .bnav button.active{color:var(--text);background:var(--surface2)}
   body{padding-bottom:86px}
@@ -1061,6 +1061,7 @@ html.lite .hero-vid{display:none}
 <nav class="bnav" id="bnav">
   <button class="active" data-mode="cases"><img class="ico3d" src="img/c_fish.webp" alt="">Кейсы</button>
   <button data-mode="up"><img class="ico3d" src="img/i_up.webp" alt="">Апгрейд</button>
+  <button data-mode="contract"><img class="ico3d" src="img/i_crown.webp" alt="">Контракт</button>
   <button data-mode="battle"><img class="ico3d" src="img/i_fire.webp" alt="">Битва</button>
   <button data-mode="wheel"><img class="ico3d" src="img/i_star.webp" alt="">Бонус</button>
   <button data-mode="sell"><img class="ico3d" src="img/i_shell.webp" alt="">Продажа</button>
@@ -1674,7 +1675,7 @@ function openCase(cs){
   CUR=cs;lastCenter=null;
   $('#caseBox').style.setProperty('--c',cs.c);
   $('#caseBox').innerHTML=`<img src="img/${cs.img}.webp" alt="">`;
-  $('#caseName').textContent=`Кейс «${cs.n}»`;$('#caseDesc').textContent=cs.d;$('#casePrice').innerHTML=fmt(cs.p)+'<img class="shell3d" src="img/i_shell.webp" alt="ракушек">';
+  $('#caseName').textContent=`Кейс «${cs.n}»`;$('#caseDesc').textContent=cs.d;{const cp=$('#casePrice');if(cp)cp.innerHTML=fmt(cs.p)+'<img class="shell3d" src="img/i_shell.webp" alt="ракушек">'}
   $('#contents').innerHTML=caseOdds(cs).sort((a,b)=>b[0].v-a[0].v).map(([it,p])=>cardHTML(it,'',84,`<span class="odds">${p<1?p.toFixed(2):p.toFixed(1)}%</span>`)).join('');
   buildStrip();show('case');setX(3*S+CW/2);
 }
@@ -2145,6 +2146,17 @@ function tdCodeModal(){if(!USER){toastAch('mega','Сначала войди в �
   d.querySelector('#admGo').onclick=async()=>{const m=d.querySelector('#admMsg');m.style.color='#9a9aa8';m.textContent='Отправляю…';const r=await tdClaim($i.value);
     if(r==='ok'){m.style.color='#3ddc97';m.textContent='Заявка отправлена. Как только владелец подтвердит, роль появится сама.'}else{m.style.color='#ff8a95';m.textContent=r}}}
 document.addEventListener('click',e=>{if(e.target.closest('[data-act="code"]'))tdCodeModal()});
+/* серия дней: за каждый подряд проведённый день — бонус ракушек (до 7 дней) */
+setTimeout(()=>{try{
+  const dk=d=>d.getFullYear()*10000+(d.getMonth()+1)*100+d.getDate(),now=new Date(),today=dk(now),y=new Date(now);y.setDate(y.getDate()-1);
+  let st=null;try{st=JSON.parse(localStorage.getItem('td_streak'))}catch(e){}
+  if(st&&st.d===today)return;
+  const n=st&&st.d===dk(y)?st.n+1:1;
+  localStorage.setItem('td_streak',JSON.stringify({d:today,n}));
+  if(n<2||typeof setBal!=='function')return;
+  const bonus=Math.min(n,7)*20;setBal(getBal()+bonus,true);
+  toastAch('i_shell','Серия: '+n+' '+(n<5?'дня':'дней')+' подряд','+'+fmt(bonus)+' ракушек','Заходи завтра — бонус растёт до 7 дней!')
+}catch(e){}},4500);
 /* онбординг: подарок новичку + плавающая кнопка */
 addEventListener('DOMContentLoaded',function(){
   const fc=$('#fcta');
